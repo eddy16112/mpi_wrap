@@ -16,7 +16,7 @@
 #ifndef MPI_WRAP_IMPL_H
 #define MPI_WRAP_IMPL_H
 
-#include "impl_wrap_type.h"
+#include "impl_common.h"
 
 typedef IMPL_Handle IMPL_Comm;
 typedef IMPL_Handle IMPL_Datatype;
@@ -28,10 +28,6 @@ typedef struct impl_wrap_handle_s {
   int (*MPI_Comm_size)(IMPL_Comm comm, int *size);
   int (*MPI_Comm_dup)(IMPL_Comm comm, IMPL_Comm *newcomm);
 } impl_wrap_handle_t;
-
-#define IMPL_COMM_NULL 0
-#define IMPL_COMM_SELF 1
-#define IMPL_COMM_WORLD 2
 
 #ifdef __cplusplus
 extern "C" {

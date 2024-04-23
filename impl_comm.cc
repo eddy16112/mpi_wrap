@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "impl_mpi_type.h"
+#include "impl_internal.h"
 #include "impl.h"
 
 #include <stddef.h>

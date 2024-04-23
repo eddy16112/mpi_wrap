@@ -16,7 +16,7 @@
 #ifndef MPI_WRAP_H
 #define MPI_WRAP_H
 
-#include "impl_wrap_type.h"
+#include "impl_common.h"
 
 typedef IMPL_Handle MPI_Comm;
 
