@@ -16,17 +16,18 @@
 #ifndef MPI_WRAP_IMPL_H
 #define MPI_WRAP_IMPL_H
 
-#include "impl_type.h"
-
-typedef IMPL_Handle IMPL_Comm;
-typedef IMPL_Handle IMPL_Datatype;
+#include "impl_wrap_type.h"
 
 #define IMPL_COMM_NULL 0
 #define IMPL_COMM_SELF 1
 #define IMPL_COMM_WORLD 2
 
-extern int IMPL_WRAP_Init(int *argc, char ***argv);
-extern int IMPL_WRAP_Comm_rank(IMPL_Comm comm, int *rank);
-extern int IMPL_WRAP_Comm_size(IMPL_Comm comm, int *size);
+#ifdef __cplusplus
+extern "C" {
+#endif
+__attribute__((visibility("default"))) int impl_wrap_init(impl_wrap_handle_t *handle, const char *mpi_lib);
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* MPI_WRAP_IMPL_H */

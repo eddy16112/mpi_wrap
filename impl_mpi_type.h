@@ -13,27 +13,18 @@
  * limitations under the License.
  */
 
-#ifndef MPI_WRAP_IMPL_TYPE_H
-#define MPI_WRAP_IMPL_TYPE_H
+#ifndef MPI_WRAP_IMPL_MPI_H
+#define MPI_WRAP_IMPL_MPI_H
 
-#include <stdint.h>
+#include <mpi.h>
 
-#ifdef __cplusplus
-union IMPL_Handle{
-  void *p;
-  int i;
-  intptr_t ip;
-  IMPL_Handle() = default;
-  IMPL_Handle(intptr_t ip_)
-  : ip(ip_)
-  {}
+struct impl_handle_s {
+  void* mpi_so_handle = nullptr;
+  int (*MPI_Init)(int *argc, char ***argv) = nullptr;
+  int (*MPI_Finalize)(void) = nullptr;
+  int (*MPI_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
+  int (*MPI_Comm_size)(MPI_Comm comm, int *size) = nullptr;
+  int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
 };
-#else
-typedef union {
-  void *p;
-  int i;
-  intptr_t ip;
-} IMPL_Handle;
-#endif
 
-#endif /* MPI_WRAP_IMPL_TYPE_H */
+#endif /* MPI_WRAP_IMPL_MPI_H */

@@ -53,7 +53,7 @@ RUNTESTS = test_comm test_comm_c
 
 all: libs $(RUNTESTS)
 
-libs: libmpi_wrap.a libmpi_wrap.$(SO) libimpl-mpich.$(SO) libimpl-ompi.$(SO)
+libs: libmpi_wrap.a libmpi_wrap.$(SO) libimpl_mpich.$(SO) libimpl_ompi.$(SO)
 
 test_comm: test_comm.cc libmpi_wrap.$(SO) mpi_wrap.h
 	$(CXX) $(CXXFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
@@ -65,39 +65,39 @@ MPI_H =
 
 IMPL_H =    impl.h
 
-IMPL_FUNCTION_C :=  impl-comm.c
+IMPL_FUNCTION_C :=  impl_comm.cc
 
-IMPL_FUNCTION_O := $(patsubst %.c,%.o,$(IMPL_FUNCTION_C))
+IMPL_FUNCTION_O := $(patsubst %.cc,%.o,$(IMPL_FUNCTION_C))
 MPICH_FUNCTION_O := $(subst impl,mpich,$(IMPL_FUNCTION_O))
 OMPI_FUNCTION_O := $(subst impl,ompi,$(IMPL_FUNCTION_O))
 
-libmpi_wrap.a: libmpi_wrap.o
+libmpi_wrap.a: mpi_wrap.o
 	$(AR) $(ARFLAGS) $@ $<
 
 
 ifeq ($(UNAME_S),Darwin)
 libmpi_wrap.$(SO): WRAPLIBS+=-Wl,-rpath,$(RPATH)
-libmpi_wrap.$(SO): WRAPLIBS+=-Wl,libimpl-mpich.dylib
-libmpi_wrap.$(SO): WRAPLIBS+=-Wl,libimpl-ompi.dylib
+libmpi_wrap.$(SO): WRAPLIBS+=-Wl,libimpl_mpich.dylib
+libmpi_wrap.$(SO): WRAPLIBS+=-Wl,libimpl_ompi.dylib
 endif
 libmpi_wrap.$(SO): SOLIBS+=-ldl
-libmpi_wrap.$(SO): mpi_wrap.o | libimpl-mpich.$(SO) libimpl-ompi.$(SO)
+libmpi_wrap.$(SO): mpi_wrap.o | libimpl_mpich.$(SO) libimpl_ompi.$(SO)
 	$(CXX) $< $(SOFLAGS) $(SOLIBS) $(WRAPLIBS) -o $@
 
-libmpi_wrap.o: mpi_wrap.cc $(MPI_H)
+mpi_wrap.o: mpi_wrap.cc $(MPI_H)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-libimpl-mpich.$(SO): $(MPICH_FUNCTION_O)
-	$(MPICHCC) $(SOFLAGS) $(SOLIBS) $^ -o $@
+libimpl_mpich.$(SO): $(MPICH_FUNCTION_O)
+	$(MPICHCXX) $(SOFLAGS) $(SOLIBS) $^ -o $@
 
-libimpl-ompi.$(SO): $(OMPI_FUNCTION_O)
-	$(OMPICC) $(SOFLAGS) $(SOLIBS) $^ -o $@
+libimpl_ompi.$(SO): $(OMPI_FUNCTION_O)
+	$(OMPICXX) $(SOFLAGS) $(SOLIBS) $^ -o $@
 
-mpich-comm.o: impl-comm.c $(IMPL_H)
-	$(MPICHCC) $(CFLAGS) $(CFLAGS_MPICH) -c $< -o $@
+mpich_comm.o: impl_comm.cc $(IMPL_H)
+	$(MPICHCXX) $(CXXFLAGS) $(CFLAGS_MPICH) -c $< -o $@
 
-ompi-comm.o: impl-comm.c $(IMPL_H)
-	$(OMPICC) $(CFLAGS) $(CFLAGS_OMPI) -c $< -o $@
+ompi_comm.o: impl_comm.cc $(IMPL_H)
+	$(OMPICXX) $(CXXFLAGS) $(CFLAGS_OMPI) -c $< -o $@
 
 check: $(RUNTESTS)
 	./test.sh ./testcoll.x

@@ -13,10 +13,8 @@
  * limitations under the License.
  */
 
-#include <mpi.h>
-
+#include "impl_mpi_type.h"
 #include "impl.h"
-// #include "impl_fnptr.h"
 
 #include <stddef.h>
 #include <dlfcn.h>
@@ -35,7 +33,7 @@ static inline MPI_Comm CONVERT_MPI_Comm(IMPL_Comm comm)
 #ifdef USE_MPICH
     return comm.i;
 #elif USE_OMPI
-    return comm.p;
+    return static_cast<MPI_Comm>(comm.p);
 #else
 #error NO ABI
 #endif
@@ -63,15 +61,9 @@ static inline IMPL_Comm OUTPUT_MPI_Comm(MPI_Comm comm)
   return wrap;
 }
 
-static void *mpi_so_handle = NULL;
+static impl_wrap_handle_t *impl_wrap_handle = nullptr;
 
-int (*IMPL_Init)(int *argc, char ***argv) = NULL;
-int (*IMPL_Finalize)(void);
-int (*IMPL_Comm_rank)(MPI_Comm comm, int *rank);
-int (*IMPL_Comm_size)(MPI_Comm comm, int *size);
-int (*IMPL_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm);
-
-static inline void *WRAP_DLSYM(void *restrict handle, const char *restrict symbol)
+static inline void *WRAP_DLSYM(void *handle, const char *symbol)
 {
   void *fp = dlsym(handle, symbol);
   if(fp == NULL) {
@@ -81,45 +73,59 @@ static inline void *WRAP_DLSYM(void *restrict handle, const char *restrict symbo
   return fp;
 }
 
-int WRAP_Load_functions(char *mpi_lib)
+int WRAP_Comm_rank(IMPL_Comm comm, int *rank)
 {
-  mpi_so_handle = dlopen(mpi_lib, RTLD_LAZY);
+  MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
+  int rc = impl_wrap_handle->impl_handle->MPI_Comm_rank(impl_comm, rank);
+  return rc;
+}
+
+int WRAP_Comm_size(IMPL_Comm comm, int *size)
+{
+  MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
+  int rc = impl_wrap_handle->impl_handle->MPI_Comm_size(impl_comm, size);
+  return rc;
+}
+
+int WRAP_Comm_dup(IMPL_Comm comm, IMPL_Comm *newcomm)
+{
+  MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
+  MPI_Comm impl_newcomm;
+  int rc = impl_wrap_handle->impl_handle->MPI_Comm_dup(impl_comm, &impl_newcomm);
+  *newcomm = OUTPUT_MPI_Comm(impl_newcomm);
+  return rc;
+}
+
+int impl_init(impl_handle_t *handle, void *mpi_so_handle)
+{
+  handle->MPI_Init = reinterpret_cast<int (*)(int*, char***)>(WRAP_DLSYM(mpi_so_handle, "MPI_Init"));
+  handle->MPI_Finalize = reinterpret_cast<int (*)()>(WRAP_DLSYM(mpi_so_handle, "MPI_Finalize"));
+  handle->MPI_Comm_rank = reinterpret_cast<int (*)(MPI_Comm, int*)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_rank"));
+  handle->MPI_Comm_size = reinterpret_cast<int (*)(MPI_Comm, int*)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_size"));
+  handle->MPI_Comm_dup = reinterpret_cast<int (*)(MPI_Comm, MPI_Comm*)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_dup"));
+  return 0;
+}
+
+extern "C" {
+
+int impl_wrap_init(impl_wrap_handle_t *handle, const char *mpi_lib)
+{
+  void *mpi_so_handle = dlopen(mpi_lib, RTLD_LAZY);
   if(mpi_so_handle == NULL) {
     printf("dlopen of %s failed: %s\n", mpi_lib, dlerror());
     abort();
   }
+  handle->impl_handle = new impl_handle_s();
+  handle->impl_handle->mpi_so_handle = mpi_so_handle;
+  impl_init(handle->impl_handle, mpi_so_handle);
 
-  IMPL_Init = WRAP_DLSYM(mpi_so_handle, "MPI_Init");
-  IMPL_Finalize = WRAP_DLSYM(mpi_so_handle, "MPI_Finalize");
-  IMPL_Comm_rank = WRAP_DLSYM(mpi_so_handle, "MPI_Comm_rank");
-  IMPL_Comm_size = WRAP_DLSYM(mpi_so_handle, "MPI_Comm_size");
-  IMPL_Comm_dup = WRAP_DLSYM(mpi_so_handle, "MPI_Comm_dup");
+  handle->MPI_Init = handle->impl_handle->MPI_Init;
+  handle->MPI_Finalize = handle->impl_handle->MPI_Finalize;
+  handle->MPI_Comm_rank = WRAP_Comm_rank;
+  handle->MPI_Comm_size = WRAP_Comm_size;
+  handle->MPI_Comm_dup = WRAP_Comm_dup;
+
+  impl_wrap_handle = handle;
   return 0;
 }
-
-int IMPL_WRAP_Init(int *argc, char ***argv) { return IMPL_Init(argc, argv); }
-
-int IMPL_WRAP_Finalize(void) { return IMPL_Finalize(); }
-
-int IMPL_WRAP_Comm_rank(IMPL_Comm comm, int *rank)
-{
-  MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
-  int rc = IMPL_Comm_rank(impl_comm, rank);
-  return rc;
-}
-
-int IMPL_WRAP_Comm_size(IMPL_Comm comm, int *size)
-{
-  MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
-  int rc = IMPL_Comm_size(impl_comm, size);
-  return rc;
-}
-
-int IMPL_WRAP_Comm_dup(IMPL_Comm comm, IMPL_Comm *newcomm)
-{
-  MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
-  MPI_Comm impl_newcomm;
-  int rc = IMPL_Comm_dup(impl_comm, &impl_newcomm);
-  *newcomm = OUTPUT_MPI_Comm(impl_newcomm);
-  return rc;
 }
