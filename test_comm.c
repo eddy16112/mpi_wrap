@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
   int me, np;
   MPI_Comm comms[2];
   comms[0] = MPI_COMM_WORLD;
-  MPI_Comm_dup(comms[0], &(comms[1]));
+  (*MPI_Comm_dup)(comms[0], &(comms[1]));
   for(int i = 0; i < 2; i++) {
     MPI_Comm_rank(comms[i], &me);
     MPI_Comm_size(comms[i], &np);

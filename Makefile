@@ -19,6 +19,7 @@ else
         MPICHCC=/scratch2/wwu/mpich-4.2.1/install/bin/mpicc
         MPICHCXX=/scratch2/wwu/mpich-4.2.1/install/bin/mpicxx
         CC=gcc
+		CXX=g++
     endif
     ifeq ($(OSID),fedora)
         OMPICC=mpicc
@@ -35,9 +36,8 @@ else
 endif
 -include Makefile.local
 
-CFLAGS += -ggdb -O0 -Wall -Wextra #-Werror # -Wpedantic
-CFLAGS += -fPIC
-CXXFLAGS = -x c++ -std=c++17
+CFLAGS += -ggdb -O0 -Wall -Wextra -fPIC#-Werror # -Wpedantic
+CXXFLAGS = -ggdb -O0 -Wall -Wextra -fPIC -std=c++17
 CFLAGS_MPICH = -DUSE_MPICH
 CFLAGS_OMPI = -DUSE_OMPI
 
@@ -55,8 +55,8 @@ all: libs $(RUNTESTS)
 
 libs: libmpi_wrap.a libmpi_wrap.$(SO) libimpl-mpich.$(SO) libimpl-ompi.$(SO)
 
-test_comm: test_comm.c libmpi_wrap.$(SO) mpi_wrap.h
-	$(CC) $(CFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
+test_comm: test_comm.cc libmpi_wrap.$(SO) mpi_wrap.h
+	$(CXX) $(CFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
 MPI_H =
 
@@ -79,10 +79,10 @@ libmpi_wrap.$(SO): WRAPLIBS+=-Wl,libimpl-ompi.dylib
 endif
 libmpi_wrap.$(SO): SOLIBS+=-ldl
 libmpi_wrap.$(SO): mpi_wrap.o | libimpl-mpich.$(SO) libimpl-ompi.$(SO)
-	$(CC) $< $(SOFLAGS) $(SOLIBS) $(WRAPLIBS) -o $@
+	$(CXX) $< $(SOFLAGS) $(SOLIBS) $(WRAPLIBS) -o $@
 
-libmpi_wrap.o: mpi_wrap.c $(MPI_H)
-	$(CC) $(CFLAGS) -c $< -o $@
+libmpi_wrap.o: mpi_wrap.cc $(MPI_H)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 libimpl-mpich.$(SO): $(MPICH_FUNCTION_O)
 	$(MPICHCC) $(SOFLAGS) $(SOLIBS) $^ -o $@

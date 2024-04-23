@@ -18,22 +18,42 @@
 
 #include <stdint.h>
 
-typedef union {
+// typedef union {
+//   void *p;
+//   int i;
+//   intptr_t ip;
+// } MUK_Handle;
+
+union MUK_Handle{
   void *p;
   int i;
   intptr_t ip;
-} MUK_Handle;
+  MUK_Handle() = default;
+  MUK_Handle(intptr_t ip_)
+  : ip(ip_)
+  {}
+};
+
 typedef MUK_Handle MPI_Comm;
 
-#define MPI_COMM_NULL  ((MPI_Comm)0)
-#define MPI_COMM_SELF  ((MPI_Comm)1)
-#define MPI_COMM_WORLD ((MPI_Comm)2)
+#define MPI_COMM_NULL  0
+#define MPI_COMM_SELF  1
+#define MPI_COMM_WORLD 2
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern int MPI_Init(int *argc, char ***argv);
 extern int MPI_Finalize(void);
 
-extern int MPI_Comm_rank(MPI_Comm comm, int *rank);
-extern int MPI_Comm_size(MPI_Comm comm, int *size);
-extern int MPI_Comm_dup(MPI_Comm comm, MPI_Comm *newcomm);
+extern int (*MPI_Comm_rank)(MPI_Comm comm, int *rank);
+extern int (*MPI_Comm_size)(MPI_Comm comm, int *size);
+extern int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm);
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif /* MPI_WRAP_H */
