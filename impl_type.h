@@ -13,31 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef MPI_WRAP_H
-#define MPI_WRAP_H
+#ifndef MPI_WRAP_IMPL_TYPE_H
+#define MPI_WRAP_IMPL_TYPE_H
 
-#include "impl_type.h"
-
-typedef IMPL_Handle MPI_Comm;
-
-#define MPI_COMM_NULL  (MPI_Comm)0
-#define MPI_COMM_SELF  (MPI_Comm)1
-#define MPI_COMM_WORLD (MPI_Comm)2
+#include <stdint.h>
 
 #ifdef __cplusplus
-extern "C" {
+union IMPL_Handle{
+  void *p;
+  int i;
+  intptr_t ip;
+  IMPL_Handle() = default;
+  IMPL_Handle(intptr_t ip_)
+  : ip(ip_)
+  {}
+};
+#else
+typedef union {
+  void *p;
+  int i;
+  intptr_t ip;
+} IMPL_Handle;
 #endif
 
-extern int MPI_Init(int *argc, char ***argv);
-extern int MPI_Finalize(void);
-
-extern int (*MPI_Comm_rank)(MPI_Comm comm, int *rank);
-extern int (*MPI_Comm_size)(MPI_Comm comm, int *size);
-extern int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm);
-
-#ifdef __cplusplus
-}
-#endif
-
-
-#endif /* MPI_WRAP_H */
+#endif /* MPI_WRAP_IMPL_TYPE_H */

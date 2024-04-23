@@ -49,14 +49,17 @@ SOLIBS =
 AR      = ar
 ARFLAGS = -r
 
-RUNTESTS = test_comm
+RUNTESTS = test_comm test_comm_c
 
 all: libs $(RUNTESTS)
 
 libs: libmpi_wrap.a libmpi_wrap.$(SO) libimpl-mpich.$(SO) libimpl-ompi.$(SO)
 
 test_comm: test_comm.cc libmpi_wrap.$(SO) mpi_wrap.h
-	$(CXX) $(CFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
+	$(CXX) $(CXXFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
+
+test_comm_c: test_comm.c libmpi_wrap.$(SO) mpi_wrap.h
+	$(CC) $(CFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
 MPI_H =
 

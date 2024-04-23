@@ -16,13 +16,7 @@
 #ifndef MPI_WRAP_IMPL_H
 #define MPI_WRAP_IMPL_H
 
-#include <stdint.h>
-
-typedef union {
-  void *p;
-  int i;
-  intptr_t ip;
-} IMPL_Handle;
+#include "impl_type.h"
 
 typedef IMPL_Handle IMPL_Comm;
 typedef IMPL_Handle IMPL_Datatype;
