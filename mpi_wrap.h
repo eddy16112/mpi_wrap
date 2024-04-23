@@ -30,8 +30,10 @@ typedef MUK_Handle MPI_Comm;
 #define MPI_COMM_WORLD ((MPI_Comm)2)
 
 extern int MPI_Init(int *argc, char ***argv);
+extern int MPI_Finalize(void);
 
 extern int MPI_Comm_rank(MPI_Comm comm, int *rank);
 extern int MPI_Comm_size(MPI_Comm comm, int *size);
+extern int MPI_Comm_dup(MPI_Comm comm, MPI_Comm *newcomm);
 
 #endif /* MPI_WRAP_H */
