@@ -61,7 +61,10 @@ static inline IMPL_Comm OUTPUT_MPI_Comm(MPI_Comm comm)
   return wrap;
 }
 
+IMPL_MPI_Handle *impl_handle = nullptr;
+
 static impl_wrap_handle_t *impl_wrap_handle = nullptr;
+
 
 static inline void *WRAP_DLSYM(void *handle, const char *symbol)
 {
@@ -76,14 +79,14 @@ static inline void *WRAP_DLSYM(void *handle, const char *symbol)
 int WRAP_Comm_rank(IMPL_Comm comm, int *rank)
 {
   MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
-  int rc = impl_wrap_handle->impl_handle->MPI_Comm_rank(impl_comm, rank);
+  int rc = impl_handle->MPI_Comm_rank(impl_comm, rank);
   return rc;
 }
 
 int WRAP_Comm_size(IMPL_Comm comm, int *size)
 {
   MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
-  int rc = impl_wrap_handle->impl_handle->MPI_Comm_size(impl_comm, size);
+  int rc = impl_handle->MPI_Comm_size(impl_comm, size);
   return rc;
 }
 
@@ -91,12 +94,12 @@ int WRAP_Comm_dup(IMPL_Comm comm, IMPL_Comm *newcomm)
 {
   MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
   MPI_Comm impl_newcomm;
-  int rc = impl_wrap_handle->impl_handle->MPI_Comm_dup(impl_comm, &impl_newcomm);
+  int rc = impl_handle->MPI_Comm_dup(impl_comm, &impl_newcomm);
   *newcomm = OUTPUT_MPI_Comm(impl_newcomm);
   return rc;
 }
 
-int impl_init(impl_handle_t *handle, void *mpi_so_handle)
+int impl_init(IMPL_MPI_Handle *handle, void *mpi_so_handle)
 {
   handle->MPI_Init = reinterpret_cast<int (*)(int*, char***)>(WRAP_DLSYM(mpi_so_handle, "MPI_Init"));
   handle->MPI_Finalize = reinterpret_cast<int (*)()>(WRAP_DLSYM(mpi_so_handle, "MPI_Finalize"));
@@ -115,12 +118,13 @@ int impl_wrap_init(impl_wrap_handle_t *handle, const char *mpi_lib)
     printf("dlopen of %s failed: %s\n", mpi_lib, dlerror());
     abort();
   }
-  handle->impl_handle = new impl_handle_s();
-  handle->impl_handle->mpi_so_handle = mpi_so_handle;
-  impl_init(handle->impl_handle, mpi_so_handle);
+  
+  impl_handle = new IMPL_MPI_Handle();
+  impl_handle->mpi_so_handle = mpi_so_handle;
+  impl_init(impl_handle, mpi_so_handle);
 
-  handle->MPI_Init = handle->impl_handle->MPI_Init;
-  handle->MPI_Finalize = handle->impl_handle->MPI_Finalize;
+  handle->MPI_Init = impl_handle->MPI_Init;
+  handle->MPI_Finalize = impl_handle->MPI_Finalize;
   handle->MPI_Comm_rank = WRAP_Comm_rank;
   handle->MPI_Comm_size = WRAP_Comm_size;
   handle->MPI_Comm_dup = WRAP_Comm_dup;

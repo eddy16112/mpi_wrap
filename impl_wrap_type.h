@@ -36,18 +36,4 @@ typedef union {
 } IMPL_Handle;
 #endif
 
-typedef IMPL_Handle IMPL_Comm;
-typedef IMPL_Handle IMPL_Datatype;
-
-typedef struct impl_handle_s impl_handle_t;
-
-typedef struct impl_wrap_handle_s {
-  impl_handle_t *impl_handle;
-  int (*MPI_Init)(int *argc, char ***argv);
-  int (*MPI_Finalize)(void);
-  int (*MPI_Comm_rank)(IMPL_Comm comm, int *rank);
-  int (*MPI_Comm_size)(IMPL_Comm comm, int *size);
-  int (*MPI_Comm_dup)(IMPL_Comm comm, IMPL_Comm *newcomm);
-} impl_wrap_handle_t;
-
 #endif /* MPI_WRAP_IMPL_WRAP_TYPE_H */

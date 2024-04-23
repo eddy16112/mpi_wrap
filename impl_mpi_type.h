@@ -18,7 +18,7 @@
 
 #include <mpi.h>
 
-struct impl_handle_s {
+struct IMPL_MPI_Handle {
   void* mpi_so_handle = nullptr;
   int (*MPI_Init)(int *argc, char ***argv) = nullptr;
   int (*MPI_Finalize)(void) = nullptr;

@@ -1,5 +1,5 @@
 #include "mpi_wrap.h"
-// #include "impl_fnptr.h"
+#include "impl.h"
 
 #include <stddef.h>
 #include <dlfcn.h>
@@ -18,7 +18,7 @@ int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm);
 
 impl_wrap_handle_t impl_wrap_handle;
 
-int (*impl_wrap_init)(impl_wrap_handle_t *handle, const char *mpi_lib);
+int (*impl_wrap_init_fnptr)(impl_wrap_handle_t *handle, const char *mpi_lib);
 
 static inline void *WRAP_DLSYM(void *handle, const char *symbol)
 {
@@ -51,9 +51,9 @@ static int mpi_wrap_load(void)
 
   printf("done with dlopen\n");
 
-  impl_wrap_init = (int (*)(impl_wrap_handle_t *, const char *))WRAP_DLSYM(
+  impl_wrap_init_fnptr = (int (*)(impl_wrap_handle_t *, const char *))WRAP_DLSYM(
       impl_so_handle, "impl_wrap_init");
-  impl_wrap_init(&impl_wrap_handle, mpi_lib);
+  impl_wrap_init_fnptr(&impl_wrap_handle, mpi_lib);
 
   MPI_Comm_rank = impl_wrap_handle.MPI_Comm_rank;
   MPI_Comm_size = impl_wrap_handle.MPI_Comm_size;

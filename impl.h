@@ -18,6 +18,17 @@
 
 #include "impl_wrap_type.h"
 
+typedef IMPL_Handle IMPL_Comm;
+typedef IMPL_Handle IMPL_Datatype;
+
+typedef struct impl_wrap_handle_s {
+  int (*MPI_Init)(int *argc, char ***argv);
+  int (*MPI_Finalize)(void);
+  int (*MPI_Comm_rank)(IMPL_Comm comm, int *rank);
+  int (*MPI_Comm_size)(IMPL_Comm comm, int *size);
+  int (*MPI_Comm_dup)(IMPL_Comm comm, IMPL_Comm *newcomm);
+} impl_wrap_handle_t;
+
 #define IMPL_COMM_NULL 0
 #define IMPL_COMM_SELF 1
 #define IMPL_COMM_WORLD 2
