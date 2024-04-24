@@ -23,7 +23,7 @@ IMPL_MPI_Handle::IMPL_MPI_Handle(const std::string &mpi_lib)
 {
   mpi_so_handle = dlopen(mpi_lib.c_str(), RTLD_LAZY);
   if(mpi_so_handle == NULL) {
-    printf("dlopen of %s failed: %s\n", mpi_lib, dlerror());
+    printf("dlopen of %s failed: %s\n", mpi_lib.c_str(), dlerror());
     abort();
   }
 

@@ -33,6 +33,7 @@ typedef struct impl_wrap_handle_s {
 extern "C" {
 #endif
 __attribute__((visibility("default"))) int impl_wrap_init(impl_wrap_handle_t *handle, const char *mpi_lib);
+__attribute__((visibility("default"))) int impl_wrap_finalize(impl_wrap_handle_t *handle);
 #ifdef __cplusplus
 }
 #endif

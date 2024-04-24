@@ -19,6 +19,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 static inline MPI_Comm CONVERT_MPI_Comm(IMPL_Comm comm)
 {
@@ -108,4 +109,13 @@ int impl_wrap_init(impl_wrap_handle_t *handle, const char *mpi_lib)
   impl_wrap_handle = handle;
   return 0;
 }
+
+int impl_wrap_finalize(impl_wrap_handle_t *handle)
+{
+  assert(handle == impl_wrap_handle);
+  delete impl_mpi_handle;
+  impl_mpi_handle = nullptr;
+  return 0;
+}
+
 }

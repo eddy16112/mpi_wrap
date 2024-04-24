@@ -5,19 +5,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static void *impl_so_handle = NULL;
+int (*MPI_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
+int (*MPI_Comm_size)(MPI_Comm comm, int *size) = nullptr;
+int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
 
-int (*WRAP_Load_functions)(char *mpi_lib);
+static impl_wrap_handle_t impl_wrap_handle;
 
-int (*WRAP_Init)(int *argc, char ***argv);
-int (*WRAP_Finalize)(void);
-int (*MPI_Comm_rank)(MPI_Comm comm, int *rank);
-int (*MPI_Comm_size)(MPI_Comm comm, int *size);
-int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm);
-
-impl_wrap_handle_t impl_wrap_handle;
-
-int (*impl_wrap_init_fnptr)(impl_wrap_handle_t *handle, const char *mpi_lib);
+static void *wrap_so_handle = NULL;
 
 static int mpi_wrap_load(void)
 {
@@ -32,22 +26,33 @@ static int mpi_wrap_load(void)
     impl_name = "/scratch2/wwu/mpi_wrap/libimpl_mpich.so";
     mpi_lib = "/scratch2/wwu/mpich-4.2.1/install/lib/libmpi.so";
   }
-  impl_so_handle = dlopen(impl_name, RTLD_LAZY);
-  if(impl_so_handle == NULL) {
+  wrap_so_handle = dlopen(impl_name, RTLD_LAZY);
+  if(wrap_so_handle == NULL) {
     printf("dlopen of %s failed: %s\n", impl_name, dlerror());
     abort();
   }
 
   printf("done with dlopen\n");
 
-  impl_wrap_init_fnptr = (int (*)(impl_wrap_handle_t *, const char *))WRAP_DLSYM(
-      impl_so_handle, "impl_wrap_init");
+  int (*impl_wrap_init_fnptr)(impl_wrap_handle_t *handle, const char *mpi_lib) = nullptr;
+  impl_wrap_init_fnptr = reinterpret_cast<int (*)(impl_wrap_handle_t *, const char *)>(WRAP_DLSYM(
+      wrap_so_handle, "impl_wrap_init"));
   impl_wrap_init_fnptr(&impl_wrap_handle, mpi_lib);
 
   MPI_Comm_rank = impl_wrap_handle.MPI_Comm_rank;
   MPI_Comm_size = impl_wrap_handle.MPI_Comm_size;
   MPI_Comm_dup = impl_wrap_handle.MPI_Comm_dup;
 
+  return 0;
+}
+
+static int mpi_wrap_unload(void)
+{
+  int (*impl_wrap_finalize_fnptr)(impl_wrap_handle_t *handle) = nullptr;
+  impl_wrap_finalize_fnptr = reinterpret_cast<int (*)(impl_wrap_handle_t *)>(WRAP_DLSYM(
+      wrap_so_handle, "impl_wrap_finalize"));
+  impl_wrap_finalize_fnptr(&impl_wrap_handle);
+  dlclose(wrap_so_handle);
   return 0;
 }
 
@@ -59,5 +64,10 @@ int MPI_Init(int *argc, char ***argv)
   return impl_wrap_handle.MPI_Init(argc, argv);
 }
 
-int MPI_Finalize(void) { return impl_wrap_handle.MPI_Finalize(); }
+int MPI_Finalize(void) 
+{ 
+  mpi_wrap_unload();
+  return impl_wrap_handle.MPI_Finalize(); 
+}
+
 }
