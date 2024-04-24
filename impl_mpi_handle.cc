@@ -19,28 +19,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-IMPL_MPI_Handle::IMPL_MPI_Handle(const std::string &mpi_lib)
+IMPL_MPI_Handle::IMPL_MPI_Handle(void *mpi_so_handle)
+ : mpi_so_handle(mpi_so_handle)
 {
-  mpi_so_handle = dlopen(mpi_lib.c_str(), RTLD_LAZY);
-  if(mpi_so_handle == NULL) {
-    printf("dlopen of %s failed: %s\n", mpi_lib.c_str(), dlerror());
-    abort();
-  }
-
-  int resultlen;
-  char lib_version[128];
-  MPI_Get_library_version(lib_version, &resultlen);
-
-  char * pos;
-  pos = strstr(lib_version, "Open MPI");
-  if (pos != NULL) {
-    version.impl = IMPL_OMPI;
-  }
-  pos = strstr(lib_version, "MPICH");
-  if (pos != NULL) {
-    version.impl = IMPL_MPICH;
-  }
-
   MPI_Init = reinterpret_cast<int (*)(int*, char***)>(WRAP_DLSYM(mpi_so_handle, "MPI_Init"));
   MPI_Finalize = reinterpret_cast<int (*)()>(WRAP_DLSYM(mpi_so_handle, "MPI_Finalize"));
   MPI_Comm_rank = reinterpret_cast<int (*)(MPI_Comm, int*)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_rank"));
@@ -50,5 +31,4 @@ IMPL_MPI_Handle::IMPL_MPI_Handle(const std::string &mpi_lib)
 
 IMPL_MPI_Handle::~IMPL_MPI_Handle()
 {
-  dlclose(mpi_so_handle);
 }

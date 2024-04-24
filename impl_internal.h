@@ -27,7 +27,7 @@
 
 class IMPL_MPI_Handle {
 public:
-  IMPL_MPI_Handle(const std::string &mpi_lib);
+  IMPL_MPI_Handle(void *mpi_so_handle);
   ~IMPL_MPI_Handle();
 
   int (*MPI_Init)(int *argc, char ***argv) = nullptr;
@@ -35,9 +35,6 @@ public:
   int (*MPI_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
   int (*MPI_Comm_size)(MPI_Comm comm, int *size) = nullptr;
   int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
-
-public:
-  mpi_version_t version;
 
 private:
   void* mpi_so_handle = nullptr;

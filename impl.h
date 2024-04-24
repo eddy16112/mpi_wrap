@@ -21,13 +21,8 @@
 typedef IMPL_Handle IMPL_Comm;
 typedef IMPL_Handle IMPL_Datatype;
 
-typedef struct mpi_version_s {
-  int major;
-  int minor;
-  int impl;
-} mpi_version_t;
-
 typedef struct impl_wrap_handle_s {
+  void *mpi_so_handle;
   int (*MPI_Init)(int *argc, char ***argv);
   int (*MPI_Finalize)(void);
   int (*MPI_Comm_rank)(IMPL_Comm comm, int *rank);
@@ -38,7 +33,6 @@ typedef struct impl_wrap_handle_s {
 #ifdef __cplusplus
 extern "C" {
 #endif
-__attribute__((visibility("default"))) int impl_wrap_get_mpi_version(const char *mpi_lib, mpi_version_t *mpi_version);
 __attribute__((visibility("default"))) int impl_wrap_init(impl_wrap_handle_t *handle);
 __attribute__((visibility("default"))) int impl_wrap_finalize(impl_wrap_handle_t *handle);
 #ifdef __cplusplus

@@ -4,7 +4,9 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 #include <string>
+#include <cstring>
 
 int (*MPI_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
 int (*MPI_Comm_size)(MPI_Comm comm, int *size) = nullptr;
@@ -12,7 +14,35 @@ int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
 
 static impl_wrap_handle_t impl_wrap_handle;
 
-static void *wrap_so_handle = NULL;
+static void *wrap_so_handle = nullptr;
+
+static void *mpi_so_handle = nullptr;
+
+static int check_mpi_version(void *handle, int * argc, char *** argv, int requested, int * provided)
+{
+  // we need to init MPI for MPICH before calling get library version
+  int resultlen;
+  char lib_version[128];
+  int (*MPI_Get_library_version)(char *version, int *resultlen) = nullptr;
+  MPI_Get_library_version = reinterpret_cast<int (*)(char *, int *)>(WRAP_DLSYM(
+      handle, "MPI_Get_library_version"));
+  MPI_Get_library_version(lib_version, &resultlen);
+  int version = -1;
+
+  char * pos;
+  pos = strstr(lib_version, "Open MPI");
+  if (pos != NULL) {
+    version = IMPL_OMPI;
+  } else {
+    pos = strstr(lib_version, "MPICH");
+    if (pos != NULL) {
+      version = IMPL_MPICH;
+    } else {
+      assert(0);
+    }
+  }
+  return version;
+}
 
 static int mpi_wrap_load(void)
 {
@@ -26,38 +56,31 @@ static int mpi_wrap_load(void)
     mpi_lib = "/scratch2/wwu/mpich-4.2.1/install/lib/libmpi.so";
   }
 
-  // let's pick one to start. It is OK for now, because 
-  // version check is ABI stable for all MPIs
-  impl_lib = "/scratch2/wwu/mpi_wrap/libimpl_mpich.so";
-  int current_impl = IMPL_MPICH;
+  mpi_so_handle = dlopen(mpi_lib.c_str(), RTLD_LAZY);
+  if(mpi_so_handle == NULL) {
+    printf("dlopen of %s failed: %s\n", mpi_lib.c_str(), dlerror());
+    abort();
+  }
+  int mpi_version = check_mpi_version(mpi_so_handle);
+  if (mpi_version == IMPL_MPICH) {
+    impl_lib = "/scratch2/wwu/mpi_wrap/libimpl_mpich.so";
+    printf("start mpich\n");
+  } else if (mpi_version == IMPL_OMPI) {
+    impl_lib = "/scratch2/wwu/mpi_wrap/libimpl_ompi.so";
+    printf("start ompi\n");
+  }
+
   wrap_so_handle = dlopen(impl_lib.c_str(), RTLD_LAZY);
   if(wrap_so_handle == NULL) {
     printf("dlopen of %s failed: %s\n", impl_lib.c_str(), dlerror());
     abort();
-  }
-  int (*impl_wrap_get_mpi_version_fnptr)(const char *mpi_lib, mpi_version_t *mpi_version) = nullptr;
-  impl_wrap_get_mpi_version_fnptr = reinterpret_cast<int (*)(const char *, mpi_version_t *)>(WRAP_DLSYM(
-      wrap_so_handle, "impl_wrap_get_mpi_version"));
-  mpi_version_t mpi_version;
-  impl_wrap_get_mpi_version_fnptr(mpi_lib.c_str(), &mpi_version);
-  
-  if (mpi_version.impl == current_impl) {
-    printf("start mpich\n");
-  } else if (mpi_version.impl == IMPL_OMPI) {
-    impl_lib = "/scratch2/wwu/mpi_wrap/libimpl_ompi.so";
-    printf("start ompi\n");
-    dlclose(wrap_so_handle);
-    wrap_so_handle = dlopen(impl_lib.c_str(), RTLD_LAZY);
-    if(wrap_so_handle == NULL) {
-      printf("dlopen of %s failed: %s\n", impl_lib.c_str(), dlerror());
-      abort();
-    }
   }
 
   int (*impl_wrap_init_fnptr)(impl_wrap_handle_t *handle) = nullptr;
   impl_wrap_init_fnptr = reinterpret_cast<int (*)(impl_wrap_handle_t *)>(WRAP_DLSYM(
       wrap_so_handle, "impl_wrap_init"));
 
+  impl_wrap_handle.mpi_so_handle = mpi_so_handle;
   impl_wrap_init_fnptr(&impl_wrap_handle);
 
   MPI_Comm_rank = impl_wrap_handle.MPI_Comm_rank;
@@ -74,6 +97,7 @@ static int mpi_wrap_unload(void)
       wrap_so_handle, "impl_wrap_finalize"));
   impl_wrap_finalize_fnptr(&impl_wrap_handle);
   dlclose(wrap_so_handle);
+  dlclose(mpi_so_handle);
   return 0;
 }
 
