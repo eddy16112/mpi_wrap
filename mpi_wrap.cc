@@ -18,29 +18,28 @@ static void *wrap_so_handle = nullptr;
 
 static void *mpi_so_handle = nullptr;
 
-static int init_mpi(void *handle, int *argc, char ***argv, int requested, int *provided)
-{
-  int rc;
-  if(provided == NULL) {
-    int (*WRAP_Init)(int *argc, char ***argv) = nullptr;
-    WRAP_Init =
-        reinterpret_cast<int (*)(int *, char ***)>(WRAP_DLSYM(handle, "MPI_Init"));
-    rc = WRAP_Init(argc, argv);
-  } else {
-    assert(0);
-  }
-  if(rc) {
-    printf("libinit: MPI initialization failed: %d\n", rc);
-    abort();
-  }
-  return rc;
-}
+// static int init_mpi(void *handle, int *argc, char ***argv, int requested, int *provided)
+// {
+//   int rc;
+//   if(provided == NULL) {
+//     int (*WRAP_Init)(int *argc, char ***argv) = nullptr;
+//     WRAP_Init =
+//         reinterpret_cast<int (*)(int *, char ***)>(WRAP_DLSYM(handle, "MPI_Init"));
+//     rc = WRAP_Init(argc, argv);
+//   } else {
+//     assert(0);
+//   }
+//   if(rc) {
+//     printf("libinit: MPI initialization failed: %d\n", rc);
+//     abort();
+//   }
+//   return rc;
+// }
 
 static int check_mpi_version(void *handle)
 {
-  // we need to init MPI for MPICH before calling MPI_Get_library_version
   int resultlen;
-  char lib_version[128];
+  char lib_version[IMPL_MAX_LIBRARY_VERSION_STRING];
   int (*WRAP_Get_library_version)(char *version, int *resultlen) = nullptr;
   WRAP_Get_library_version = reinterpret_cast<int (*)(char *, int *)>(
       WRAP_DLSYM(handle, "MPI_Get_library_version"));
@@ -80,7 +79,7 @@ static int mpi_wrap_load(int *argc, char ***argv, int requested, int *provided)
     printf("dlopen of %s failed: %s\n", mpi_lib.c_str(), dlerror());
     abort();
   }
-  int mpi_init_status = init_mpi(mpi_so_handle, argc, argv, requested, provided);
+  // int mpi_init_status = init_mpi(mpi_so_handle, argc, argv, requested, provided);
   int mpi_version = check_mpi_version(mpi_so_handle);
   if(mpi_version == IMPL_MPICH) {
     impl_lib = "/scratch2/wwu/mpi_wrap/libimpl_mpich.so";
@@ -107,7 +106,7 @@ static int mpi_wrap_load(int *argc, char ***argv, int requested, int *provided)
   MPI_Comm_size = impl_wrap_handle.MPI_Comm_size;
   MPI_Comm_dup = impl_wrap_handle.MPI_Comm_dup;
 
-  return mpi_init_status;
+  return 0;
 }
 
 static int mpi_wrap_unload(void)
@@ -125,7 +124,9 @@ extern "C" {
 
 int MPI_Init(int *argc, char ***argv)
 {
-  int rc = mpi_wrap_load(argc, argv, 0, NULL);
+  int rc = 0;
+  mpi_wrap_load(argc, argv, 0, NULL);
+  rc = impl_wrap_handle.MPI_Init(argc, argv);
   return rc;
 }
 

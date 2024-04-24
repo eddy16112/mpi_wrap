@@ -18,6 +18,8 @@
 
 #include "impl_common.h"
 
+#define IMPL_MAX_LIBRARY_VERSION_STRING 8192
+
 typedef IMPL_Handle IMPL_Comm;
 typedef IMPL_Handle IMPL_Datatype;
 

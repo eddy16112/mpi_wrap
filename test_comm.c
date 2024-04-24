@@ -16,16 +16,15 @@
 
 int main(int argc, char *argv[])
 {
-  int rc;
-  rc = MPI_Init(&argc, &argv);
-
 #ifdef USE_REAL_MPI
   {
     int resultlen;
-    char lib_version[32];
+    char lib_version[MPI_MAX_LIBRARY_VERSION_STRING];
     MPI_Get_library_version(lib_version, &resultlen);
   }
 #endif
+  int rc;
+  rc = MPI_Init(&argc, &argv);
 
   // printf("main: MPI_COMM_WORLD=%lx\n", (intptr_t)MPI_COMM_WORLD);
 
