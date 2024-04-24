@@ -36,6 +36,9 @@ public:
   int (*MPI_Comm_size)(MPI_Comm comm, int *size) = nullptr;
   int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
 
+public:
+  mpi_version_t version;
+
 private:
   void* mpi_so_handle = nullptr;
 };

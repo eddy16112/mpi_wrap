@@ -90,15 +90,16 @@ int WRAP_Comm_dup(IMPL_Comm comm, IMPL_Comm *newcomm)
 
 extern "C" {
 
-int impl_wrap_init(impl_wrap_handle_t *handle, const char *mpi_lib)
+int impl_wrap_get_mpi_version(const char *mpi_lib, mpi_version_t *mpi_version)
 {
-  void *mpi_so_handle = dlopen(mpi_lib, RTLD_LAZY);
-  if(mpi_so_handle == NULL) {
-    printf("dlopen of %s failed: %s\n", mpi_lib, dlerror());
-    abort();
-  }
-  
   impl_mpi_handle = new IMPL_MPI_Handle(mpi_lib);
+  *mpi_version = impl_mpi_handle->version;
+  return 0;
+}
+
+int impl_wrap_init(impl_wrap_handle_t *handle)
+{
+  assert(impl_mpi_handle != nullptr); 
 
   handle->MPI_Init = impl_mpi_handle->MPI_Init;
   handle->MPI_Finalize = impl_mpi_handle->MPI_Finalize;

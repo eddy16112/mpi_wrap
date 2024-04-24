@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string>
 
 int (*MPI_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
 int (*MPI_Comm_size)(MPI_Comm comm, int *size) = nullptr;
@@ -17,27 +18,47 @@ static int mpi_wrap_load(void)
 {
   char *env = getenv("MPI_LIB");
   int version = atoi(env);
-  char *impl_name;
-  char *mpi_lib;
+  std::string impl_lib;
+  std::string mpi_lib;
   if(version == 1) {
-    impl_name = "/scratch2/wwu/mpi_wrap/libimpl_ompi.so";
     mpi_lib = "/usr/local/openmpi-4.1.5/lib/libmpi.so";
   } else {
-    impl_name = "/scratch2/wwu/mpi_wrap/libimpl_mpich.so";
     mpi_lib = "/scratch2/wwu/mpich-4.2.1/install/lib/libmpi.so";
   }
-  wrap_so_handle = dlopen(impl_name, RTLD_LAZY);
+
+  // let's pick one to start. It is OK for now, because 
+  // version check is ABI stable for all MPIs
+  impl_lib = "/scratch2/wwu/mpi_wrap/libimpl_mpich.so";
+  int current_impl = IMPL_MPICH;
+  wrap_so_handle = dlopen(impl_lib.c_str(), RTLD_LAZY);
   if(wrap_so_handle == NULL) {
-    printf("dlopen of %s failed: %s\n", impl_name, dlerror());
+    printf("dlopen of %s failed: %s\n", impl_lib.c_str(), dlerror());
     abort();
   }
+  int (*impl_wrap_get_mpi_version_fnptr)(const char *mpi_lib, mpi_version_t *mpi_version) = nullptr;
+  impl_wrap_get_mpi_version_fnptr = reinterpret_cast<int (*)(const char *, mpi_version_t *)>(WRAP_DLSYM(
+      wrap_so_handle, "impl_wrap_get_mpi_version"));
+  mpi_version_t mpi_version;
+  impl_wrap_get_mpi_version_fnptr(mpi_lib.c_str(), &mpi_version);
+  
+  if (mpi_version.impl == current_impl) {
+    printf("start mpich\n");
+  } else if (mpi_version.impl == IMPL_OMPI) {
+    impl_lib = "/scratch2/wwu/mpi_wrap/libimpl_ompi.so";
+    printf("start ompi\n");
+    dlclose(wrap_so_handle);
+    wrap_so_handle = dlopen(impl_lib.c_str(), RTLD_LAZY);
+    if(wrap_so_handle == NULL) {
+      printf("dlopen of %s failed: %s\n", impl_lib.c_str(), dlerror());
+      abort();
+    }
+  }
 
-  printf("done with dlopen\n");
-
-  int (*impl_wrap_init_fnptr)(impl_wrap_handle_t *handle, const char *mpi_lib) = nullptr;
-  impl_wrap_init_fnptr = reinterpret_cast<int (*)(impl_wrap_handle_t *, const char *)>(WRAP_DLSYM(
+  int (*impl_wrap_init_fnptr)(impl_wrap_handle_t *handle) = nullptr;
+  impl_wrap_init_fnptr = reinterpret_cast<int (*)(impl_wrap_handle_t *)>(WRAP_DLSYM(
       wrap_so_handle, "impl_wrap_init"));
-  impl_wrap_init_fnptr(&impl_wrap_handle, mpi_lib);
+
+  impl_wrap_init_fnptr(&impl_wrap_handle);
 
   MPI_Comm_rank = impl_wrap_handle.MPI_Comm_rank;
   MPI_Comm_size = impl_wrap_handle.MPI_Comm_size;
@@ -66,8 +87,9 @@ int MPI_Init(int *argc, char ***argv)
 
 int MPI_Finalize(void) 
 { 
+  int rc = impl_wrap_handle.MPI_Finalize();
   mpi_wrap_unload();
-  return impl_wrap_handle.MPI_Finalize(); 
+  return rc;
 }
 
 }

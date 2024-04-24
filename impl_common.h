@@ -39,6 +39,9 @@ typedef union {
 } IMPL_Handle;
 #endif
 
+#define IMPL_MPICH 0
+#define IMPL_OMPI 1
+
 static inline void *WRAP_DLSYM(void *handle, const char *symbol)
 {
   void *fp = dlsym(handle, symbol);
