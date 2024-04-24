@@ -7,7 +7,7 @@
 
 #include <unistd.h>
 
-#ifdef USE_REALM_MPI
+#ifdef USE_REAL_MPI
 #include <mpi.h>
 #else
 #include "mpi_wrap.h"
@@ -18,6 +18,14 @@ int main(int argc, char *argv[])
 {
   int rc;
   rc = MPI_Init(&argc, &argv);
+
+#ifdef USE_REAL_MPI
+  {
+    int resultlen;
+    char lib_version[32];
+    MPI_Get_library_version(lib_version, &resultlen);
+  }
+#endif
 
   // printf("main: MPI_COMM_WORLD=%lx\n", (intptr_t)MPI_COMM_WORLD);
 
