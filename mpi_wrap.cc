@@ -2,7 +2,6 @@
 #include "impl.h"
 
 #include <stddef.h>
-#include <dlfcn.h>
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -19,16 +18,6 @@ int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm);
 impl_wrap_handle_t impl_wrap_handle;
 
 int (*impl_wrap_init_fnptr)(impl_wrap_handle_t *handle, const char *mpi_lib);
-
-static inline void *WRAP_DLSYM(void *handle, const char *symbol)
-{
-  void *fp = dlsym(handle, symbol);
-  if(fp == NULL) {
-    printf("MUK_DLSYM: failed to find %s - %s\n", symbol, dlerror());
-    fflush(0);
-  }
-  return fp;
-}
 
 static int mpi_wrap_load(void)
 {
