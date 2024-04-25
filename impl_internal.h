@@ -25,6 +25,8 @@
 #define WRAP_COMM_SELF 1
 #define WRAP_COMM_WORLD 2
 
+typedef long int WRAP_Aint;
+
 namespace IMPL {
 
   class IMPL_MPI_Handle {
@@ -33,6 +35,7 @@ namespace IMPL {
     ~IMPL_MPI_Handle();
 
     int (*IMPL_Init)(int *argc, char ***argv) = nullptr;
+    int (*IMPL_Init_thread)(int *argc, char ***argv, int required, int *provided) = nullptr;
     int (*IMPL_Finalize)(void) = nullptr;
     int (*IMPL_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
     int (*IMPL_Comm_size)(MPI_Comm comm, int *size) = nullptr;

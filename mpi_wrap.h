@@ -26,6 +26,13 @@ const MPI_Comm MPI_COMM_WORLD = {.ip = 2};
 
 #define MPI_CONGRUENT 1
 
+#define MPI_THREAD_SINGLE WRAP_THREAD_SINGLE
+#define MPI_THREAD_FUNNELED WRAP_THREAD_FUNNELED
+#define MPI_THREAD_SERIALIZED WRAP_THREAD_SERIALIZED
+#define MPI_THREAD_MULTIPLE WRAP_THREAD_MULTIPLE
+
+typedef ptrdiff_t MPI_Aint;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -33,8 +40,8 @@ extern "C" {
 // //#define MPI_COMM_WORLD 2
 // const MPI_Comm MPI_COMM_WORLD = {.ip = 2};
 
-
 extern int MPI_Init(int *argc, char ***argv);
+extern int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);
 extern int MPI_Finalize(void);
 
 extern int (*MPI_Comm_rank)(MPI_Comm comm, int *rank);
@@ -46,6 +53,5 @@ extern int (*MPI_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result);
 #ifdef __cplusplus
 }
 #endif
-
 
 #endif /* MPI_WRAP_H */

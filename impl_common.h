@@ -30,6 +30,14 @@ typedef union {
 #define IMPL_MPICH 0
 #define IMPL_OMPI 1
 
+enum {
+    // MPICH and OMPI agree on this
+    WRAP_THREAD_SINGLE       = 0,
+    WRAP_THREAD_FUNNELED     = 1,
+    WRAP_THREAD_SERIALIZED   = 2,
+    WRAP_THREAD_MULTIPLE     = 3
+};
+
 static inline void *WRAP_DLSYM(void *handle, const char *symbol)
 {
   void *fp = dlsym(handle, symbol);

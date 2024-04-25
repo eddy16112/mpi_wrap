@@ -43,8 +43,7 @@ static int check_mpi_version(void *handle)
   int resultlen;
   char lib_version[IMPL_MAX_LIBRARY_VERSION_STRING];
   int (*WRAP_Get_library_version)(char *version, int *resultlen) = nullptr;
-  WRAP_Get_library_version = reinterpret_cast<int (*)(char *, int *)>(
-      WRAP_DLSYM(handle, "MPI_Get_library_version"));
+  WRAP_Get_library_version = reinterpret_cast<int (*)(char *, int *)>(WRAP_DLSYM(handle, "MPI_Get_library_version"));
   WRAP_Get_library_version(lib_version, &resultlen);
   int mpi_version = -1;
 
@@ -98,8 +97,7 @@ static int mpi_wrap_load(int *argc, char ***argv, int requested, int *provided)
   }
 
   int (*impl_wrap_init_fnptr)(impl_wrap_handle_t *handle) = nullptr;
-  impl_wrap_init_fnptr = reinterpret_cast<int (*)(impl_wrap_handle_t *)>(
-      WRAP_DLSYM(wrap_so_handle, "impl_wrap_init"));
+  impl_wrap_init_fnptr = reinterpret_cast<int (*)(impl_wrap_handle_t *)>(WRAP_DLSYM(wrap_so_handle, "impl_wrap_init"));
 
   impl_wrap_handle.mpi_so_handle = mpi_so_handle;
   impl_wrap_init_fnptr(&impl_wrap_handle);
@@ -116,8 +114,7 @@ static int mpi_wrap_load(int *argc, char ***argv, int requested, int *provided)
 static int mpi_wrap_unload(void)
 {
   int (*impl_wrap_finalize_fnptr)(impl_wrap_handle_t *handle) = nullptr;
-  impl_wrap_finalize_fnptr = reinterpret_cast<int (*)(impl_wrap_handle_t *)>(
-      WRAP_DLSYM(wrap_so_handle, "impl_wrap_finalize"));
+  impl_wrap_finalize_fnptr = reinterpret_cast<int (*)(impl_wrap_handle_t *)>(WRAP_DLSYM(wrap_so_handle, "impl_wrap_finalize"));
   impl_wrap_finalize_fnptr(&impl_wrap_handle);
   dlclose(wrap_so_handle);
   dlclose(mpi_so_handle);
@@ -131,6 +128,14 @@ int MPI_Init(int *argc, char ***argv)
   int rc = 0;
   mpi_wrap_load(argc, argv, 0, NULL);
   rc = impl_wrap_handle.WRAP_Init(argc, argv);
+  return rc;
+}
+
+int MPI_Init_thread(int *argc, char ***argv, int required, int *provided)
+{
+  int rc = 0;
+  mpi_wrap_load(argc, argv, 0, NULL);
+  rc = impl_wrap_handle.WRAP_Init_thread(argc, argv, required, provided);
   return rc;
 }
 

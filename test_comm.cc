@@ -23,8 +23,8 @@ int main(int argc, char *argv[])
   }
 #endif
 
-  int rc;
-  rc = MPI_Init(&argc, &argv);
+  int rc, provided;
+  rc = MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
 
   // printf("main: MPI_COMM_WORLD=%lx\n", (intptr_t)MPI_COMM_WORLD);
 

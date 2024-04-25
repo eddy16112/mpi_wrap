@@ -107,17 +107,33 @@ namespace IMPL {
     int rc = impl_mpi_handle->IMPL_Comm_compare(WRAP_Comm1, WRAP_Comm2, result);
     return rc;
   }
+
+  static int check_mpi_types(void)
+  {
+    static_assert(sizeof(MPI_Aint) == sizeof(WRAP_Aint));
+    static_assert(IMPL_MAX_LIBRARY_VERSION_STRING >= MPI_MAX_LIBRARY_VERSION_STRING);
+
+    static_assert(WRAP_THREAD_SINGLE == MPI_THREAD_SINGLE);
+    static_assert(WRAP_THREAD_FUNNELED == MPI_THREAD_FUNNELED);
+    static_assert(WRAP_THREAD_SERIALIZED == MPI_THREAD_SERIALIZED);
+    static_assert(WRAP_THREAD_MULTIPLE == MPI_THREAD_MULTIPLE);
+
+    return 0;
+  }
 }; // namespace IMPL
 
 extern "C" {
 
 int impl_wrap_init(impl_wrap_handle_t *handle)
 {
+  IMPL::check_mpi_types();
+
   assert(IMPL::impl_mpi_handle == nullptr);
   IMPL::impl_mpi_handle = new IMPL::IMPL_MPI_Handle(handle->mpi_so_handle);
 
   // the following functions are ABI stable, so we can pass the MPI implementation directly
   handle->WRAP_Init = IMPL::impl_mpi_handle->IMPL_Init;
+  handle->WRAP_Init_thread = IMPL::impl_mpi_handle->IMPL_Init_thread;
   handle->WRAP_Finalize = IMPL::impl_mpi_handle->IMPL_Finalize;
 
   // the following functions are not ABI stable, so we need a wrapper

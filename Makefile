@@ -1,11 +1,14 @@
 UNAME_S := $(shell uname)
 
+MPICH_DIR=/scratch2/wwu/mpich-4.2.1/install
+OMPI_DIR=/usr/local/openmpi-4.1.5
+
+OMPICC=$(OMPI_DIR)/bin/mpicc
+OMPICXX=$(OMPI_DIR)/bin/mpicxx
+MPICHCC=$(MPICH_DIR)/bin/mpicc
+MPICHCXX=$(MPICH_DIR)/bin/mpicxx
+
 ifeq ($(UNAME_S),Darwin)
-    brew_prefix := $(shell brew --prefix)
-    OMPICC=$(wildcard $(brew_prefix)/Cellar/open-mpi/*/bin/mpicc)
-    OMPICXX=$(wildcard $(brew_prefix)/Cellar/open-mpi/*/bin/mpicxx)
-    MPICHCC=$(wildcard $(brew_prefix)/Cellar/mpich/*/bin/mpicc)
-    MPICHCXX=$(wildcard $(brew_prefix)/Cellar/mpich/*/bin/mpicxx)
     CC=clang
     CFLAGS=-ferror-limit=1 # Clang
     #CFLAGS+=-Wno-c2x-extensions
@@ -14,18 +17,10 @@ ifeq ($(UNAME_S),Darwin)
 else
     OSID := $(shell grep '^ID=' /etc/os-release | cut -d= -f2)
     ifeq ($(OSID),ubuntu)
-        OMPICC=mpicc
-        OMPICXX=mpicxx
-        MPICHCC=/scratch2/wwu/mpich-4.2.1/install/bin/mpicc
-        MPICHCXX=/scratch2/wwu/mpich-4.2.1/install/bin/mpicxx
         CC=gcc
 		CXX=g++
     endif
     ifeq ($(OSID),fedora)
-        OMPICC=mpicc
-        OMPICXX=mpicxx
-        MPICHCC=/scratch2/wwu/mpich-4.2.1/install/bin/mpicc
-        MPICHCXX=/scratch2/wwu/mpich-4.2.1/install/bin/mpicxx
         CFLAGS=-fmax-errors=1 # GCC
         #CFLAGS+= -fsanitize=address
         # these suppress true errors with callbacks
