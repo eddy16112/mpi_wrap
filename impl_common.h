@@ -21,23 +21,11 @@
 #include <dlfcn.h>
 #include <stdio.h>
 
-#ifdef __cplusplus
-union IMPL_Handle {
-  void *p;
-  int i;
-  intptr_t ip;
-  IMPL_Handle() = default;
-  IMPL_Handle(intptr_t ip_)
-    : ip(ip_)
-  {}
-};
-#else
 typedef union {
   void *p;
   int i;
   intptr_t ip;
 } IMPL_Handle;
-#endif
 
 #define IMPL_MPICH 0
 #define IMPL_OMPI 1

@@ -25,6 +25,10 @@
 #define IMPL_COMM_SELF 1
 #define IMPL_COMM_WORLD 2
 
+#ifdef BUILD_FROM_SRC_FOR_OTHER_MPI
+extern IMPL_Handle MPI_COMM_WORLD_ptr;
+#endif
+
 class IMPL_MPI_Handle {
 public:
   IMPL_MPI_Handle(void *mpi_so_handle);

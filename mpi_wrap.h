@@ -20,13 +20,17 @@
 
 typedef IMPL_Handle MPI_Comm;
 
-#define MPI_COMM_NULL  (MPI_Comm)0
-#define MPI_COMM_SELF  (MPI_Comm)1
-#define MPI_COMM_WORLD (MPI_Comm)2
+const MPI_Comm MPI_COMM_NULL = {.ip = 0};
+const MPI_Comm MPI_COMM_SELF = {.ip = 1};
+const MPI_Comm MPI_COMM_WORLD = {.ip = 2};
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+// //#define MPI_COMM_WORLD 2
+// const MPI_Comm MPI_COMM_WORLD = {.ip = 2};
+
 
 extern int MPI_Init(int *argc, char ***argv);
 extern int MPI_Finalize(void);
