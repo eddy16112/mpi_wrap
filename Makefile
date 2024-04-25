@@ -65,7 +65,7 @@ MPI_H =
 
 IMPL_H =    impl.h
 
-IMPL_FUNCTION_C :=  impl_comm.cc impl_mpi_handle.cc
+IMPL_FUNCTION_C :=  impl_wrap.cc impl_mpi.cc
 
 IMPL_FUNCTION_O := $(patsubst %.cc,%.o,$(IMPL_FUNCTION_C))
 MPICH_FUNCTION_O := $(subst impl,mpich,$(IMPL_FUNCTION_O))
@@ -93,17 +93,17 @@ libimpl_mpich.$(SO): $(MPICH_FUNCTION_O)
 libimpl_ompi.$(SO): $(OMPI_FUNCTION_O)
 	$(OMPICXX) $(SOFLAGS) $(SOLIBS) $^ -o $@
 
-mpich_comm.o: impl_comm.cc $(IMPL_H)
+mpich_wrap.o: impl_wrap.cc $(IMPL_H)
 	$(MPICHCXX) $(CXXFLAGS) $(CFLAGS_MPICH) -c $< -o $@
 
-ompi_mpi_handle.o: impl_mpi_handle.cc $(IMPL_H)
+ompi_wrap.o: impl_wrap.cc $(IMPL_H)
 	$(OMPICXX) $(CXXFLAGS) $(CFLAGS_OMPI) -c $< -o $@
 
-mpich_mpi_handle.o: impl_mpi_handle.cc $(IMPL_H)
+ompi_mpi.o: impl_mpi.cc $(IMPL_H)
+	$(OMPICXX) $(CXXFLAGS) $(CFLAGS_OMPI) -c $< -o $@
+
+mpich_mpi.o: impl_mpi.cc $(IMPL_H)
 	$(MPICHCXX) $(CXXFLAGS) $(CFLAGS_MPICH) -c $< -o $@
-
-ompi_comm.o: impl_comm.cc $(IMPL_H)
-	$(OMPICXX) $(CXXFLAGS) $(CFLAGS_OMPI) -c $< -o $@
 
 check: $(RUNTESTS)
 	./test.sh ./testcoll.x
