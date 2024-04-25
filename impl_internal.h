@@ -25,21 +25,25 @@
 #define IMPL_COMM_SELF 1
 #define IMPL_COMM_WORLD 2
 
-class IMPL_MPI_Handle {
-public:
-  IMPL_MPI_Handle(void *mpi_so_handle);
-  ~IMPL_MPI_Handle();
+namespace IMPL {
 
-  int (*IMPL_Init)(int *argc, char ***argv) = nullptr;
-  int (*IMPL_Finalize)(void) = nullptr;
-  int (*IMPL_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
-  int (*IMPL_Comm_size)(MPI_Comm comm, int *size) = nullptr;
-  int (*IMPL_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
-  int (*IMPL_Comm_free)(MPI_Comm *comm) = nullptr;
-  int (*IMPL_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result) = nullptr;
+  class IMPL_MPI_Handle {
+  public:
+    IMPL_MPI_Handle(void *mpi_so_handle);
+    ~IMPL_MPI_Handle();
 
-private:
-  void* mpi_so_handle = nullptr;
-};
+    int (*IMPL_Init)(int *argc, char ***argv) = nullptr;
+    int (*IMPL_Finalize)(void) = nullptr;
+    int (*IMPL_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
+    int (*IMPL_Comm_size)(MPI_Comm comm, int *size) = nullptr;
+    int (*IMPL_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
+    int (*IMPL_Comm_free)(MPI_Comm *comm) = nullptr;
+    int (*IMPL_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result) = nullptr;
+
+  private:
+    void *mpi_so_handle = nullptr;
+  };
+
+}; // namespace IMPL
 
 #endif /* MPI_WRAP_IMPL_INTERNAL_H */
