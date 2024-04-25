@@ -36,8 +36,8 @@ else
 endif
 -include Makefile.local
 
-CFLAGS += -ggdb -O0 -Wall -Wextra -fPIC -DBUILD_FROM_SRC_FOR_OTHER_MPI #-Werror # -Wpedantic 
-CXXFLAGS = -ggdb -O0 -Wall -Wextra -fPIC -std=c++17 -DBUILD_FROM_SRC_FOR_OTHER_MPI
+CFLAGS += -ggdb -O0 -Wall -Wextra -fPIC  #-Werror # -Wpedantic 
+CXXFLAGS = -ggdb -O0 -Wall -Wextra -fPIC -std=c++17
 CFLAGS_MPICH = -DUSE_MPICH
 CFLAGS_OMPI = -DUSE_OMPI
 

@@ -21,21 +21,8 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#ifdef BUILD_FROM_SRC_FOR_OTHER_MPI
-IMPL_Handle MPI_COMM_WORLD_ptr;
-#endif
-
 static inline MPI_Comm CONVERT_MPI_Comm(IMPL_Comm comm)
 {
-#ifdef BUILD_FROM_SRC_FOR_OTHER_MPI
-  MPI_Comm mpi_comm;
-  if(comm.ip == (intptr_t)IMPL_COMM_WORLD) {
-    mpi_comm = *(reinterpret_cast<MPI_Comm *>(MPI_COMM_WORLD_ptr.p));
-  } else {
-    mpi_comm = *(reinterpret_cast<MPI_Comm *>(comm.p));
-  }
-  return mpi_comm;
-#else
   if(comm.ip == (intptr_t)IMPL_COMM_WORLD) {
     return MPI_COMM_WORLD;
   } else if(comm.ip == (intptr_t)IMPL_COMM_SELF) {
@@ -51,17 +38,10 @@ static inline MPI_Comm CONVERT_MPI_Comm(IMPL_Comm comm)
 #error NO ABI
 #endif
   }
-#endif
 }
 
 static inline IMPL_Comm OUTPUT_MPI_Comm(MPI_Comm comm)
 {
-#ifdef BUILD_FROM_SRC_FOR_OTHER_MPI
-  IMPL_Comm wrap = {0};
-  wrap.p = reinterpret_cast<void *>(malloc(sizeof(MPI_Comm)));
-  *(reinterpret_cast<MPI_Comm *>(wrap.p)) = comm;
-  return wrap;
-#else
   IMPL_Comm wrap = {0};
   if(comm == MPI_COMM_NULL) {
     wrap.ip = (intptr_t)IMPL_COMM_NULL;
@@ -79,7 +59,6 @@ static inline IMPL_Comm OUTPUT_MPI_Comm(MPI_Comm comm)
 #endif
   }
   return wrap;
-#endif
 }
 
 IMPL_MPI_Handle *impl_mpi_handle = nullptr;
@@ -124,18 +103,11 @@ int impl_wrap_init(impl_wrap_handle_t *handle)
 
   impl_wrap_handle = handle;
 
-#ifdef BUILD_FROM_SRC_FOR_OTHER_MPI
-  MPI_COMM_WORLD_ptr.p = reinterpret_cast<void *>(malloc(sizeof(MPI_Comm)));
-  *(reinterpret_cast<MPI_Comm *>(MPI_COMM_WORLD_ptr.p)) = MPI_COMM_WORLD;
-#endif
   return 0;
 }
 
 int impl_wrap_finalize(impl_wrap_handle_t *handle)
 {
-#ifdef BUILD_FROM_SRC_FOR_OTHER_MPI
-  free(MPI_COMM_WORLD_ptr.p);
-#endif
   assert(handle == impl_wrap_handle);
   delete impl_mpi_handle;
   impl_mpi_handle = nullptr;
