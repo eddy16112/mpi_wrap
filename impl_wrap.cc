@@ -134,7 +134,10 @@ int impl_wrap_init(impl_wrap_handle_t *handle)
   // the following functions are ABI stable, so we can pass the MPI implementation directly
   handle->WRAP_Init = IMPL::impl_mpi_handle->IMPL_Init;
   handle->WRAP_Init_thread = IMPL::impl_mpi_handle->IMPL_Init_thread;
+  handle->WRAP_Initialized = IMPL::impl_mpi_handle->IMPL_Initialized;
+  handle->WRAP_Query_thread = IMPL::impl_mpi_handle->IMPL_Query_thread;
   handle->WRAP_Finalize = IMPL::impl_mpi_handle->IMPL_Finalize;
+  handle->WRAP_Finalized = IMPL::impl_mpi_handle->IMPL_Finalized;
 
   // the following functions are not ABI stable, so we need a wrapper
   handle->WRAP_Comm_rank = IMPL::WRAP_Comm_rank;

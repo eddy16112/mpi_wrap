@@ -25,9 +25,14 @@ typedef IMPL_Handle WRAP_Datatype;
 
 typedef struct impl_wrap_handle_s {
   void *mpi_so_handle;
+
   int (*WRAP_Init)(int *argc, char ***argv);
   int (*WRAP_Init_thread)(int *argc, char ***argv, int required, int *provided);
+  int (*WRAP_Initialized)(int *flag);
+  int (*WRAP_Query_thread)(int *provided);
   int (*WRAP_Finalize)(void);
+  int (*WRAP_Finalized)(int *flag);
+
   int (*WRAP_Comm_rank)(WRAP_Comm comm, int *rank);
   int (*WRAP_Comm_size)(WRAP_Comm comm, int *size);
   int (*WRAP_Comm_dup)(WRAP_Comm comm, WRAP_Comm *newcomm);

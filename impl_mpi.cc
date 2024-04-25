@@ -26,7 +26,11 @@ namespace IMPL {
   {
     IMPL_Init = reinterpret_cast<int (*)(int *, char ***)>(WRAP_DLSYM(mpi_so_handle, "MPI_Init"));
     IMPL_Init_thread = reinterpret_cast<int (*)(int *, char ***, int, int *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Init_thread"));
+    IMPL_Initialized = reinterpret_cast<int (*)(int *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Initialized"));
+    IMPL_Query_thread = reinterpret_cast<int (*)(int *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Query_thread"));
     IMPL_Finalize = reinterpret_cast<int (*)()>(WRAP_DLSYM(mpi_so_handle, "MPI_Finalize"));
+    IMPL_Finalized = reinterpret_cast<int (*)(int *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Finalized"));
+
     IMPL_Comm_rank = reinterpret_cast<int (*)(MPI_Comm, int *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_rank"));
     IMPL_Comm_size = reinterpret_cast<int (*)(MPI_Comm, int *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_size"));
     IMPL_Comm_dup = reinterpret_cast<int (*)(MPI_Comm, MPI_Comm *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_dup"));

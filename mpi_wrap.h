@@ -24,6 +24,8 @@ const MPI_Comm MPI_COMM_NULL = {.ip = 0};
 const MPI_Comm MPI_COMM_SELF = {.ip = 1};
 const MPI_Comm MPI_COMM_WORLD = {.ip = 2};
 
+#define MPI_SUCCESS 0
+
 #define MPI_CONGRUENT 1
 
 #define MPI_THREAD_SINGLE WRAP_THREAD_SINGLE
@@ -42,7 +44,11 @@ extern "C" {
 
 extern int MPI_Init(int *argc, char ***argv);
 extern int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);
+extern int MPI_Initialized(int *flag);
 extern int MPI_Finalize(void);
+extern int MPI_Finalized(int *flag);
+
+extern int (*MPI_Query_thread)(int *provided);
 
 extern int (*MPI_Comm_rank)(MPI_Comm comm, int *rank);
 extern int (*MPI_Comm_size)(MPI_Comm comm, int *size);

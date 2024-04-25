@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include <unistd.h>
 
@@ -23,10 +24,14 @@ int main(int argc, char *argv[])
   }
 #endif
 
-  int rc, provided;
+  int rc, provided, flag;
+  MPI_Initialized(&flag);
+  assert(flag == 0);
   rc = MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
-
-  // printf("main: MPI_COMM_WORLD=%lx\n", (intptr_t)MPI_COMM_WORLD);
+  MPI_Initialized(&flag);
+  assert(flag == 1);
+  MPI_Query_thread(&provided);
+  assert(provided == MPI_THREAD_MULTIPLE);
 
   int me, np;
   MPI_Comm comms[2];
@@ -41,9 +46,13 @@ int main(int argc, char *argv[])
   int result;
   MPI_Comm_compare(comms[0], comms[1], &result);
   printf("compare result %d\n", result);
-
+  
   MPI_Comm_free(&(comms[1]));
 
+  MPI_Finalized(&flag);
+  assert(flag == 0);
   MPI_Finalize();
+  MPI_Finalized(&flag);
+  assert(flag == 1);
   return rc;
 }

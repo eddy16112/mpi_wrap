@@ -36,7 +36,11 @@ namespace IMPL {
 
     int (*IMPL_Init)(int *argc, char ***argv) = nullptr;
     int (*IMPL_Init_thread)(int *argc, char ***argv, int required, int *provided) = nullptr;
+    int (*IMPL_Initialized)(int *flag) = nullptr;
+    int (*IMPL_Query_thread)(int *provided) = nullptr;
     int (*IMPL_Finalize)(void) = nullptr;
+    int (*IMPL_Finalized)(int *flag) = nullptr;
+  
     int (*IMPL_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
     int (*IMPL_Comm_size)(MPI_Comm comm, int *size) = nullptr;
     int (*IMPL_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;

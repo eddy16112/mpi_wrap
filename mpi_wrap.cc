@@ -8,6 +8,8 @@
 #include <string>
 #include <cstring>
 
+int (*MPI_Query_thread)(int *provided) = nullptr;
+
 int (*MPI_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
 int (*MPI_Comm_size)(MPI_Comm comm, int *size) = nullptr;
 int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
@@ -15,6 +17,8 @@ int (*MPI_Comm_free)(MPI_Comm *comm) = nullptr;
 int (*MPI_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result) = nullptr;
 
 static impl_wrap_handle_t impl_wrap_handle;
+
+static bool impl_wrap_handle_initialized = false;
 
 static void *wrap_so_handle = nullptr;
 
@@ -65,6 +69,10 @@ static int check_mpi_version(void *handle)
 
 static int mpi_wrap_load(int *argc, char ***argv, int requested, int *provided)
 {
+  if (impl_wrap_handle_initialized) {
+    return 0;
+  }
+
   char *env = getenv("MPI_LIB");
   int version = atoi(env);
   std::string impl_lib;
@@ -102,26 +110,43 @@ static int mpi_wrap_load(int *argc, char ***argv, int requested, int *provided)
   impl_wrap_handle.mpi_so_handle = mpi_so_handle;
   impl_wrap_init_fnptr(&impl_wrap_handle);
 
+  MPI_Query_thread = impl_wrap_handle.WRAP_Query_thread;
+
   MPI_Comm_rank = impl_wrap_handle.WRAP_Comm_rank;
   MPI_Comm_size = impl_wrap_handle.WRAP_Comm_size;
   MPI_Comm_dup = impl_wrap_handle.WRAP_Comm_dup;
   MPI_Comm_free = impl_wrap_handle.WRAP_Comm_free;
   MPI_Comm_compare = impl_wrap_handle.WRAP_Comm_compare;
 
+  impl_wrap_handle_initialized = true;
+
   return 0;
 }
 
 static int mpi_wrap_unload(void)
 {
+  assert(impl_wrap_handle_initialized);
   int (*impl_wrap_finalize_fnptr)(impl_wrap_handle_t *handle) = nullptr;
   impl_wrap_finalize_fnptr = reinterpret_cast<int (*)(impl_wrap_handle_t *)>(WRAP_DLSYM(wrap_so_handle, "impl_wrap_finalize"));
   impl_wrap_finalize_fnptr(&impl_wrap_handle);
   dlclose(wrap_so_handle);
   dlclose(mpi_so_handle);
+  impl_wrap_handle_initialized = false;
   return 0;
 }
 
 extern "C" {
+
+int MPI_Initialized(int *flag)
+{
+  if (!impl_wrap_handle_initialized) {
+    *flag = 0;
+    return MPI_SUCCESS;
+  } else {
+    int rc = impl_wrap_handle.WRAP_Initialized(flag);
+    return rc;
+  }
+}
 
 int MPI_Init(int *argc, char ***argv)
 {
@@ -144,5 +169,16 @@ int MPI_Finalize(void)
   int rc = impl_wrap_handle.WRAP_Finalize();
   mpi_wrap_unload();
   return rc;
+}
+
+int MPI_Finalized(int *flag)
+{
+  if (!impl_wrap_handle_initialized) {
+    *flag = 1;
+    return MPI_SUCCESS;
+  } else {
+    int rc = impl_wrap_handle.WRAP_Finalized(flag);
+    return rc;
+  }
 }
 }
