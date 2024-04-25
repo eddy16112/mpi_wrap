@@ -27,6 +27,15 @@ typedef union {
   intptr_t ip;
 } IMPL_Handle;
 
+typedef IMPL_Handle WRAP_Comm;
+typedef IMPL_Handle WRAP_Datatype;
+
+#define WRAP_COMM_NULL 0
+#define WRAP_COMM_SELF 1
+#define WRAP_COMM_WORLD 2
+
+typedef long int WRAP_Aint;
+
 #define IMPL_MPICH 0
 #define IMPL_OMPI 1
 
@@ -37,15 +46,5 @@ enum {
     WRAP_THREAD_SERIALIZED   = 2,
     WRAP_THREAD_MULTIPLE     = 3
 };
-
-static inline void *WRAP_DLSYM(void *handle, const char *symbol)
-{
-  void *fp = dlsym(handle, symbol);
-  if(fp == NULL) {
-    printf("dlsym: failed to find %s - %s\n", symbol, dlerror());
-    fflush(0);
-  }
-  return fp;
-}
 
 #endif /* MPI_WRAP_IMPL_COMMON_H */

@@ -113,10 +113,10 @@ namespace IMPL {
     static_assert(sizeof(MPI_Aint) == sizeof(WRAP_Aint));
     static_assert(IMPL_MAX_LIBRARY_VERSION_STRING >= MPI_MAX_LIBRARY_VERSION_STRING);
 
-    static_assert(WRAP_THREAD_SINGLE == MPI_THREAD_SINGLE);
-    static_assert(WRAP_THREAD_FUNNELED == MPI_THREAD_FUNNELED);
-    static_assert(WRAP_THREAD_SERIALIZED == MPI_THREAD_SERIALIZED);
-    static_assert(WRAP_THREAD_MULTIPLE == MPI_THREAD_MULTIPLE);
+    static_assert(static_cast<int>(WRAP_THREAD_SINGLE) == static_cast<int>(MPI_THREAD_SINGLE));
+    static_assert(static_cast<int>(WRAP_THREAD_FUNNELED) == static_cast<int>(MPI_THREAD_FUNNELED));
+    static_assert(static_cast<int>(WRAP_THREAD_SERIALIZED) == static_cast<int>(MPI_THREAD_SERIALIZED));
+    static_assert(static_cast<int>(WRAP_THREAD_MULTIPLE) == static_cast<int>(MPI_THREAD_MULTIPLE));
 
     return 0;
   }

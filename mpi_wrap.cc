@@ -18,132 +18,142 @@ int (*MPI_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result) = nullptr;
 
 namespace MUK {
 
-static impl_wrap_handle_t impl_wrap_handle;
+  static impl_wrap_handle_t impl_wrap_handle;
 
-static bool impl_wrap_handle_initialized = false;
+  static bool impl_wrap_handle_initialized = false;
 
-static void *wrap_so_handle = nullptr;
+  static void *wrap_so_handle = nullptr;
 
-static void *mpi_so_handle = nullptr;
+  static void *mpi_so_handle = nullptr;
 
-// static int init_mpi(void *handle, int *argc, char ***argv, int requested, int *provided)
-// {
-//   int rc;
-//   if(provided == NULL) {
-//     int (*WRAP_Init)(int *argc, char ***argv) = nullptr;
-//     WRAP_Init =
-//         reinterpret_cast<int (*)(int *, char ***)>(WRAP_DLSYM(handle, "MPI_Init"));
-//     rc = WRAP_Init(argc, argv);
-//   } else {
-//     assert(0);
-//   }
-//   if(rc) {
-//     printf("libinit: MPI initialization failed: %d\n", rc);
-//     abort();
-//   }
-//   return rc;
-// }
+  // static int init_mpi(void *handle, int *argc, char ***argv, int requested, int *provided)
+  // {
+  //   int rc;
+  //   if(provided == NULL) {
+  //     int (*WRAP_Init)(int *argc, char ***argv) = nullptr;
+  //     WRAP_Init =
+  //         reinterpret_cast<int (*)(int *, char ***)>(WRAP_DLSYM(handle, "MPI_Init"));
+  //     rc = WRAP_Init(argc, argv);
+  //   } else {
+  //     assert(0);
+  //   }
+  //   if(rc) {
+  //     printf("libinit: MPI initialization failed: %d\n", rc);
+  //     abort();
+  //   }
+  //   return rc;
+  // }
 
-static int check_mpi_version(void *handle)
-{
-  int resultlen;
-  char lib_version[IMPL_MAX_LIBRARY_VERSION_STRING];
-  int (*WRAP_Get_library_version)(char *version, int *resultlen) = nullptr;
-  WRAP_Get_library_version = reinterpret_cast<int (*)(char *, int *)>(WRAP_DLSYM(handle, "MPI_Get_library_version"));
-  WRAP_Get_library_version(lib_version, &resultlen);
-  int mpi_version = -1;
-
-  char *pos;
-  pos = strstr(lib_version, "Open MPI");
-  if(pos != NULL) {
-    mpi_version = IMPL_OMPI;
-  } else {
-    pos = strstr(lib_version, "MPICH");
-    if(pos != NULL) {
-      mpi_version = IMPL_MPICH;
-    } else {
-      assert(0);
+  static inline void *WRAP_DLSYM(void *handle, const char *symbol)
+  {
+    void *fp = dlsym(handle, symbol);
+    if(fp == NULL) {
+      printf("dlsym: failed to find %s - %s\n", symbol, dlerror());
+      fflush(0);
     }
+    return fp;
   }
-  printf("version %d\n", mpi_version);
-  return mpi_version;
-}
 
-static int mpi_wrap_load(int *argc, char ***argv, int requested, int *provided)
-{
-  if (impl_wrap_handle_initialized) {
+  static int check_mpi_version(void *handle)
+  {
+    int resultlen;
+    char lib_version[IMPL_MAX_LIBRARY_VERSION_STRING];
+    int (*WRAP_Get_library_version)(char *version, int *resultlen) = nullptr;
+    WRAP_Get_library_version = reinterpret_cast<int (*)(char *, int *)>(WRAP_DLSYM(handle, "MPI_Get_library_version"));
+    WRAP_Get_library_version(lib_version, &resultlen);
+    int mpi_version = -1;
+
+    char *pos;
+    pos = strstr(lib_version, "Open MPI");
+    if(pos != NULL) {
+      mpi_version = IMPL_OMPI;
+    } else {
+      pos = strstr(lib_version, "MPICH");
+      if(pos != NULL) {
+        mpi_version = IMPL_MPICH;
+      } else {
+        assert(0);
+      }
+    }
+    printf("version %d\n", mpi_version);
+    return mpi_version;
+  }
+
+  static int mpi_wrap_load(int *argc, char ***argv, int requested, int *provided)
+  {
+    if(impl_wrap_handle_initialized) {
+      return 0;
+    }
+
+    char *env = getenv("MPI_LIB");
+    int version = atoi(env);
+    std::string impl_lib;
+    std::string mpi_lib;
+    if(version == 1) {
+      mpi_lib = "/usr/local/openmpi-4.1.5/lib/libmpi.so";
+    } else {
+      mpi_lib = "/scratch2/wwu/mpich-4.2.1/install/lib/libmpi.so";
+    }
+
+    mpi_so_handle = dlopen(mpi_lib.c_str(), RTLD_LAZY);
+    if(mpi_so_handle == NULL) {
+      printf("dlopen of %s failed: %s\n", mpi_lib.c_str(), dlerror());
+      abort();
+    }
+    // int mpi_init_status = init_mpi(mpi_so_handle, argc, argv, requested, provided);
+    int mpi_version = check_mpi_version(mpi_so_handle);
+    if(mpi_version == IMPL_MPICH) {
+      impl_lib = "/scratch2/wwu/mpi_wrap/libimpl_mpich.so";
+      printf("start mpich\n");
+    } else if(mpi_version == IMPL_OMPI) {
+      impl_lib = "/scratch2/wwu/mpi_wrap/libimpl_ompi.so";
+      printf("start ompi\n");
+    }
+
+    wrap_so_handle = dlopen(impl_lib.c_str(), RTLD_LAZY);
+    if(wrap_so_handle == NULL) {
+      printf("dlopen of %s failed: %s\n", impl_lib.c_str(), dlerror());
+      abort();
+    }
+
+    int (*impl_wrap_init_fnptr)(impl_wrap_handle_t *handle) = nullptr;
+    impl_wrap_init_fnptr = reinterpret_cast<int (*)(impl_wrap_handle_t *)>(WRAP_DLSYM(wrap_so_handle, "impl_wrap_init"));
+
+    impl_wrap_handle.mpi_so_handle = mpi_so_handle;
+    impl_wrap_init_fnptr(&impl_wrap_handle);
+
+    MPI_Query_thread = impl_wrap_handle.WRAP_Query_thread;
+
+    MPI_Comm_rank = impl_wrap_handle.WRAP_Comm_rank;
+    MPI_Comm_size = impl_wrap_handle.WRAP_Comm_size;
+    MPI_Comm_dup = impl_wrap_handle.WRAP_Comm_dup;
+    MPI_Comm_free = impl_wrap_handle.WRAP_Comm_free;
+    MPI_Comm_compare = impl_wrap_handle.WRAP_Comm_compare;
+
+    impl_wrap_handle_initialized = true;
+
     return 0;
   }
 
-  char *env = getenv("MPI_LIB");
-  int version = atoi(env);
-  std::string impl_lib;
-  std::string mpi_lib;
-  if(version == 1) {
-    mpi_lib = "/usr/local/openmpi-4.1.5/lib/libmpi.so";
-  } else {
-    mpi_lib = "/scratch2/wwu/mpich-4.2.1/install/lib/libmpi.so";
+  static int mpi_wrap_unload(void)
+  {
+    assert(impl_wrap_handle_initialized);
+    int (*impl_wrap_finalize_fnptr)(impl_wrap_handle_t *handle) = nullptr;
+    impl_wrap_finalize_fnptr = reinterpret_cast<int (*)(impl_wrap_handle_t *)>(WRAP_DLSYM(wrap_so_handle, "impl_wrap_finalize"));
+    impl_wrap_finalize_fnptr(&impl_wrap_handle);
+    dlclose(wrap_so_handle);
+    dlclose(mpi_so_handle);
+    impl_wrap_handle_initialized = false;
+    return 0;
   }
 
-  mpi_so_handle = dlopen(mpi_lib.c_str(), RTLD_LAZY);
-  if(mpi_so_handle == NULL) {
-    printf("dlopen of %s failed: %s\n", mpi_lib.c_str(), dlerror());
-    abort();
-  }
-  // int mpi_init_status = init_mpi(mpi_so_handle, argc, argv, requested, provided);
-  int mpi_version = check_mpi_version(mpi_so_handle);
-  if(mpi_version == IMPL_MPICH) {
-    impl_lib = "/scratch2/wwu/mpi_wrap/libimpl_mpich.so";
-    printf("start mpich\n");
-  } else if(mpi_version == IMPL_OMPI) {
-    impl_lib = "/scratch2/wwu/mpi_wrap/libimpl_ompi.so";
-    printf("start ompi\n");
-  }
-
-  wrap_so_handle = dlopen(impl_lib.c_str(), RTLD_LAZY);
-  if(wrap_so_handle == NULL) {
-    printf("dlopen of %s failed: %s\n", impl_lib.c_str(), dlerror());
-    abort();
-  }
-
-  int (*impl_wrap_init_fnptr)(impl_wrap_handle_t *handle) = nullptr;
-  impl_wrap_init_fnptr = reinterpret_cast<int (*)(impl_wrap_handle_t *)>(WRAP_DLSYM(wrap_so_handle, "impl_wrap_init"));
-
-  impl_wrap_handle.mpi_so_handle = mpi_so_handle;
-  impl_wrap_init_fnptr(&impl_wrap_handle);
-
-  MPI_Query_thread = impl_wrap_handle.WRAP_Query_thread;
-
-  MPI_Comm_rank = impl_wrap_handle.WRAP_Comm_rank;
-  MPI_Comm_size = impl_wrap_handle.WRAP_Comm_size;
-  MPI_Comm_dup = impl_wrap_handle.WRAP_Comm_dup;
-  MPI_Comm_free = impl_wrap_handle.WRAP_Comm_free;
-  MPI_Comm_compare = impl_wrap_handle.WRAP_Comm_compare;
-
-  impl_wrap_handle_initialized = true;
-
-  return 0;
-}
-
-static int mpi_wrap_unload(void)
-{
-  assert(impl_wrap_handle_initialized);
-  int (*impl_wrap_finalize_fnptr)(impl_wrap_handle_t *handle) = nullptr;
-  impl_wrap_finalize_fnptr = reinterpret_cast<int (*)(impl_wrap_handle_t *)>(WRAP_DLSYM(wrap_so_handle, "impl_wrap_finalize"));
-  impl_wrap_finalize_fnptr(&impl_wrap_handle);
-  dlclose(wrap_so_handle);
-  dlclose(mpi_so_handle);
-  impl_wrap_handle_initialized = false;
-  return 0;
-}
-
-};
+}; // namespace MUK
 
 extern "C" {
 
 int MPI_Initialized(int *flag)
 {
-  if (!MUK::impl_wrap_handle_initialized) {
+  if(!MUK::impl_wrap_handle_initialized) {
     *flag = 0;
     return MPI_SUCCESS;
   } else {
@@ -177,7 +187,7 @@ int MPI_Finalize(void)
 
 int MPI_Finalized(int *flag)
 {
-  if (!MUK::impl_wrap_handle_initialized) {
+  if(!MUK::impl_wrap_handle_initialized) {
     *flag = 1;
     return MPI_SUCCESS;
   } else {

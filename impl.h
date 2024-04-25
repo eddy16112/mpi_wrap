@@ -16,12 +16,9 @@
 #ifndef MPI_WRAP_IMPL_H
 #define MPI_WRAP_IMPL_H
 
-#include "impl_common.h"
+#include "impl_wrap_type.h"
 
 #define IMPL_MAX_LIBRARY_VERSION_STRING 8192
-
-typedef IMPL_Handle WRAP_Comm;
-typedef IMPL_Handle WRAP_Datatype;
 
 typedef struct impl_wrap_handle_s {
   void *mpi_so_handle;

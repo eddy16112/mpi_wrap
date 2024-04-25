@@ -16,13 +16,13 @@
 #ifndef MPI_WRAP_H
 #define MPI_WRAP_H
 
-#include "impl_common.h"
+#include "impl_wrap_type.h"
 
-typedef IMPL_Handle MPI_Comm;
+typedef WRAP_Comm MPI_Comm;
 
-const MPI_Comm MPI_COMM_NULL = {.ip = 0};
-const MPI_Comm MPI_COMM_SELF = {.ip = 1};
-const MPI_Comm MPI_COMM_WORLD = {.ip = 2};
+const MPI_Comm MPI_COMM_NULL = {.ip = WRAP_COMM_NULL};
+const MPI_Comm MPI_COMM_SELF = {.ip = WRAP_COMM_SELF};
+const MPI_Comm MPI_COMM_WORLD = {.ip = WRAP_COMM_WORLD};
 
 #define MPI_SUCCESS 0
 
@@ -33,7 +33,7 @@ const MPI_Comm MPI_COMM_WORLD = {.ip = 2};
 #define MPI_THREAD_SERIALIZED WRAP_THREAD_SERIALIZED
 #define MPI_THREAD_MULTIPLE WRAP_THREAD_MULTIPLE
 
-typedef ptrdiff_t MPI_Aint;
+typedef WRAP_Aint MPI_Aint;
 
 #ifdef __cplusplus
 extern "C" {

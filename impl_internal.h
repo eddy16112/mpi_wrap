@@ -21,12 +21,6 @@
 
 #include "impl.h"
 
-#define WRAP_COMM_NULL 0
-#define WRAP_COMM_SELF 1
-#define WRAP_COMM_WORLD 2
-
-typedef long int WRAP_Aint;
-
 namespace IMPL {
 
   class IMPL_MPI_Handle {
@@ -40,7 +34,7 @@ namespace IMPL {
     int (*IMPL_Query_thread)(int *provided) = nullptr;
     int (*IMPL_Finalize)(void) = nullptr;
     int (*IMPL_Finalized)(int *flag) = nullptr;
-  
+
     int (*IMPL_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
     int (*IMPL_Comm_size)(MPI_Comm comm, int *size) = nullptr;
     int (*IMPL_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
@@ -50,6 +44,16 @@ namespace IMPL {
   private:
     void *mpi_so_handle = nullptr;
   };
+
+  static inline void *WRAP_DLSYM(void *handle, const char *symbol)
+  {
+    void *fp = dlsym(handle, symbol);
+    if(fp == NULL) {
+      printf("dlsym: failed to find %s - %s\n", symbol, dlerror());
+      fflush(0);
+    }
+    return fp;
+  }
 
 }; // namespace IMPL
 
