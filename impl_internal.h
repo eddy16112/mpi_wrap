@@ -21,9 +21,9 @@
 
 #include "impl.h"
 
-#define IMPL_COMM_NULL 0
-#define IMPL_COMM_SELF 1
-#define IMPL_COMM_WORLD 2
+#define WRAP_COMM_NULL 0
+#define WRAP_COMM_SELF 1
+#define WRAP_COMM_WORLD 2
 
 namespace IMPL {
 

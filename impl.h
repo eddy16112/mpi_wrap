@@ -20,18 +20,18 @@
 
 #define IMPL_MAX_LIBRARY_VERSION_STRING 8192
 
-typedef IMPL_Handle IMPL_Comm;
-typedef IMPL_Handle IMPL_Datatype;
+typedef IMPL_Handle WRAP_Comm;
+typedef IMPL_Handle WRAP_Datatype;
 
 typedef struct impl_wrap_handle_s {
   void *mpi_so_handle;
   int (*WRAP_Init)(int *argc, char ***argv);
   int (*WRAP_Finalize)(void);
-  int (*WRAP_Comm_rank)(IMPL_Comm comm, int *rank);
-  int (*WRAP_Comm_size)(IMPL_Comm comm, int *size);
-  int (*WRAP_Comm_dup)(IMPL_Comm comm, IMPL_Comm *newcomm);
-  int (*WRAP_Comm_free)(IMPL_Comm *comm);
-  int (*WRAP_Comm_compare)(IMPL_Comm comm1, IMPL_Comm comm2, int *result);
+  int (*WRAP_Comm_rank)(WRAP_Comm comm, int *rank);
+  int (*WRAP_Comm_size)(WRAP_Comm comm, int *size);
+  int (*WRAP_Comm_dup)(WRAP_Comm comm, WRAP_Comm *newcomm);
+  int (*WRAP_Comm_free)(WRAP_Comm *comm);
+  int (*WRAP_Comm_compare)(WRAP_Comm comm1, WRAP_Comm comm2, int *result);
 } impl_wrap_handle_t;
 
 #ifdef __cplusplus

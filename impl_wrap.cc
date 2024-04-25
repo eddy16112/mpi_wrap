@@ -14,7 +14,6 @@
  */
 
 #include "impl_internal.h"
-#include "impl.h"
 
 #include <stddef.h>
 #include <stdio.h>
@@ -27,13 +26,13 @@ namespace IMPL {
 
   static impl_wrap_handle_t *impl_wrap_handle = nullptr;
 
-  static inline MPI_Comm CONVERT_MPI_Comm(IMPL_Comm comm)
+  static inline MPI_Comm CONVERT_MPI_Comm(WRAP_Comm comm)
   {
-    if(comm.ip == (intptr_t)IMPL_COMM_WORLD) {
+    if(comm.ip == (intptr_t)WRAP_COMM_WORLD) {
       return MPI_COMM_WORLD;
-    } else if(comm.ip == (intptr_t)IMPL_COMM_SELF) {
+    } else if(comm.ip == (intptr_t)WRAP_COMM_SELF) {
       return MPI_COMM_SELF;
-    } else if(comm.ip == (intptr_t)IMPL_COMM_NULL) {
+    } else if(comm.ip == (intptr_t)WRAP_COMM_NULL) {
       return MPI_COMM_NULL;
     } else {
 #ifdef USE_MPICH
@@ -46,15 +45,15 @@ namespace IMPL {
     }
   }
 
-  static inline IMPL_Comm OUTPUT_MPI_Comm(MPI_Comm comm)
+  static inline WRAP_Comm OUTPUT_MPI_Comm(MPI_Comm comm)
   {
-    IMPL_Comm wrap = {0};
+    WRAP_Comm wrap = {0};
     if(comm == MPI_COMM_NULL) {
-      wrap.ip = (intptr_t)IMPL_COMM_NULL;
+      wrap.ip = (intptr_t)WRAP_COMM_NULL;
     } else if(comm == MPI_COMM_WORLD) {
-      wrap.ip = (intptr_t)IMPL_COMM_WORLD;
+      wrap.ip = (intptr_t)WRAP_COMM_WORLD;
     } else if(comm == MPI_COMM_SELF) {
-      wrap.ip = (intptr_t)IMPL_COMM_SELF;
+      wrap.ip = (intptr_t)WRAP_COMM_SELF;
     } else {
 #ifdef USE_MPICH
       wrap.i = comm;
@@ -67,43 +66,45 @@ namespace IMPL {
     return wrap;
   }
 
-  static int WRAP_Comm_rank(IMPL_Comm comm, int *rank)
+  // the following functions are the wrapper of MPI functions
+
+  static int WRAP_Comm_rank(WRAP_Comm comm, int *rank)
   {
-    MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
-    int rc = impl_mpi_handle->IMPL_Comm_rank(impl_comm, rank);
+    MPI_Comm WRAP_Comm = CONVERT_MPI_Comm(comm);
+    int rc = impl_mpi_handle->IMPL_Comm_rank(WRAP_Comm, rank);
     return rc;
   }
 
-  static int WRAP_Comm_size(IMPL_Comm comm, int *size)
+  static int WRAP_Comm_size(WRAP_Comm comm, int *size)
   {
-    MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
-    int rc = impl_mpi_handle->IMPL_Comm_size(impl_comm, size);
+    MPI_Comm WRAP_Comm = CONVERT_MPI_Comm(comm);
+    int rc = impl_mpi_handle->IMPL_Comm_size(WRAP_Comm, size);
     return rc;
   }
 
-  static int WRAP_Comm_dup(IMPL_Comm comm, IMPL_Comm *newcomm)
+  static int WRAP_Comm_dup(WRAP_Comm comm, WRAP_Comm *newcomm)
   {
-    MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
+    MPI_Comm WRAP_Comm = CONVERT_MPI_Comm(comm);
     MPI_Comm impl_newcomm;
-    int rc = impl_mpi_handle->IMPL_Comm_dup(impl_comm, &impl_newcomm);
+    int rc = impl_mpi_handle->IMPL_Comm_dup(WRAP_Comm, &impl_newcomm);
     *newcomm = OUTPUT_MPI_Comm(impl_newcomm);
     return rc;
   }
 
-  static int WRAP_Comm_free(IMPL_Comm *comm)
+  static int WRAP_Comm_free(WRAP_Comm *comm)
   {
     int rc;
-    MPI_Comm impl_comm = CONVERT_MPI_Comm(*comm);
-    rc = impl_mpi_handle->IMPL_Comm_free(&impl_comm);
-    *comm = OUTPUT_MPI_Comm(impl_comm);
+    MPI_Comm WRAP_Comm = CONVERT_MPI_Comm(*comm);
+    rc = impl_mpi_handle->IMPL_Comm_free(&WRAP_Comm);
+    *comm = OUTPUT_MPI_Comm(WRAP_Comm);
     return rc;
   }
 
-  static int WRAP_Comm_compare(IMPL_Comm comm1, IMPL_Comm comm2, int *result)
+  static int WRAP_Comm_compare(WRAP_Comm comm1, WRAP_Comm comm2, int *result)
   {
-    MPI_Comm impl_comm1 = CONVERT_MPI_Comm(comm1);
-    MPI_Comm impl_comm2 = CONVERT_MPI_Comm(comm2);
-    int rc = impl_mpi_handle->IMPL_Comm_compare(impl_comm1, impl_comm2, result);
+    MPI_Comm WRAP_Comm1 = CONVERT_MPI_Comm(comm1);
+    MPI_Comm WRAP_Comm2 = CONVERT_MPI_Comm(comm2);
+    int rc = impl_mpi_handle->IMPL_Comm_compare(WRAP_Comm1, WRAP_Comm2, result);
     return rc;
   }
 }; // namespace IMPL
