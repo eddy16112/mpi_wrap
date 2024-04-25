@@ -30,11 +30,13 @@ public:
   IMPL_MPI_Handle(void *mpi_so_handle);
   ~IMPL_MPI_Handle();
 
-  int (*MPI_Init)(int *argc, char ***argv) = nullptr;
-  int (*MPI_Finalize)(void) = nullptr;
-  int (*MPI_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
-  int (*MPI_Comm_size)(MPI_Comm comm, int *size) = nullptr;
-  int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
+  int (*IMPL_Init)(int *argc, char ***argv) = nullptr;
+  int (*IMPL_Finalize)(void) = nullptr;
+  int (*IMPL_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
+  int (*IMPL_Comm_size)(MPI_Comm comm, int *size) = nullptr;
+  int (*IMPL_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
+  int (*IMPL_Comm_free)(MPI_Comm *comm) = nullptr;
+  int (*IMPL_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result) = nullptr;
 
 private:
   void* mpi_so_handle = nullptr;

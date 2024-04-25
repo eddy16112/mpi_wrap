@@ -24,6 +24,8 @@ const MPI_Comm MPI_COMM_NULL = {.ip = 0};
 const MPI_Comm MPI_COMM_SELF = {.ip = 1};
 const MPI_Comm MPI_COMM_WORLD = {.ip = 2};
 
+#define MPI_CONGRUENT 1
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,6 +40,8 @@ extern int MPI_Finalize(void);
 extern int (*MPI_Comm_rank)(MPI_Comm comm, int *rank);
 extern int (*MPI_Comm_size)(MPI_Comm comm, int *size);
 extern int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm);
+extern int (*MPI_Comm_free)(MPI_Comm *comm);
+extern int (*MPI_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result);
 
 #ifdef __cplusplus
 }

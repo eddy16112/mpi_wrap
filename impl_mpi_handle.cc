@@ -22,11 +22,14 @@
 IMPL_MPI_Handle::IMPL_MPI_Handle(void *mpi_so_handle)
  : mpi_so_handle(mpi_so_handle)
 {
-  MPI_Init = reinterpret_cast<int (*)(int*, char***)>(WRAP_DLSYM(mpi_so_handle, "MPI_Init"));
-  MPI_Finalize = reinterpret_cast<int (*)()>(WRAP_DLSYM(mpi_so_handle, "MPI_Finalize"));
-  MPI_Comm_rank = reinterpret_cast<int (*)(MPI_Comm, int*)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_rank"));
-  MPI_Comm_size = reinterpret_cast<int (*)(MPI_Comm, int*)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_size"));
-  MPI_Comm_dup = reinterpret_cast<int (*)(MPI_Comm, MPI_Comm*)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_dup"));
+  IMPL_Init = reinterpret_cast<int (*)(int*, char***)>(WRAP_DLSYM(mpi_so_handle, "MPI_Init"));
+  IMPL_Finalize = reinterpret_cast<int (*)()>(WRAP_DLSYM(mpi_so_handle, "MPI_Finalize"));
+  IMPL_Comm_rank = reinterpret_cast<int (*)(MPI_Comm, int*)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_rank"));
+  IMPL_Comm_size = reinterpret_cast<int (*)(MPI_Comm, int*)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_size"));
+  IMPL_Comm_dup = reinterpret_cast<int (*)(MPI_Comm, MPI_Comm*)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_dup"));
+  IMPL_Comm_free = reinterpret_cast<int (*)(MPI_Comm*)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_free"));
+  IMPL_Comm_compare = reinterpret_cast<int (*)(MPI_Comm, MPI_Comm, int*)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_compare"));
+  // IMPL_Comm_free = MPI_Comm_free;
 }
 
 IMPL_MPI_Handle::~IMPL_MPI_Handle()

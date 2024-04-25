@@ -25,11 +25,13 @@ typedef IMPL_Handle IMPL_Datatype;
 
 typedef struct impl_wrap_handle_s {
   void *mpi_so_handle;
-  int (*MPI_Init)(int *argc, char ***argv);
-  int (*MPI_Finalize)(void);
-  int (*MPI_Comm_rank)(IMPL_Comm comm, int *rank);
-  int (*MPI_Comm_size)(IMPL_Comm comm, int *size);
-  int (*MPI_Comm_dup)(IMPL_Comm comm, IMPL_Comm *newcomm);
+  int (*WRAP_Init)(int *argc, char ***argv);
+  int (*WRAP_Finalize)(void);
+  int (*WRAP_Comm_rank)(IMPL_Comm comm, int *rank);
+  int (*WRAP_Comm_size)(IMPL_Comm comm, int *size);
+  int (*WRAP_Comm_dup)(IMPL_Comm comm, IMPL_Comm *newcomm);
+  int (*WRAP_Comm_free)(IMPL_Comm *comm);
+  int (*WRAP_Comm_compare)(IMPL_Comm comm1, IMPL_Comm comm2, int *result);
 } impl_wrap_handle_t;
 
 #ifdef __cplusplus

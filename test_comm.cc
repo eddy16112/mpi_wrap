@@ -31,12 +31,18 @@ int main(int argc, char *argv[])
   int me, np;
   MPI_Comm comms[2];
   comms[0] = MPI_COMM_WORLD;
-  (*MPI_Comm_dup)(comms[0], &(comms[1]));
+  MPI_Comm_dup(comms[0], &(comms[1]));
   for(int i = 0; i < 2; i++) {
     MPI_Comm_rank(comms[i], &me);
     MPI_Comm_size(comms[i], &np);
     printf("I am %d of %d\n", me, np);
   }
+
+  int result;
+  MPI_Comm_compare(comms[0], comms[1], &result);
+  printf("compare result %d\n", result);
+
+  MPI_Comm_free(&(comms[1]));
 
   MPI_Finalize();
   return rc;

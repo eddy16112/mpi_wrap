@@ -11,6 +11,8 @@
 int (*MPI_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
 int (*MPI_Comm_size)(MPI_Comm comm, int *size) = nullptr;
 int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
+int (*MPI_Comm_free)(MPI_Comm *comm) = nullptr;
+int (*MPI_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result) = nullptr;
 
 static impl_wrap_handle_t impl_wrap_handle;
 
@@ -102,9 +104,11 @@ static int mpi_wrap_load(int *argc, char ***argv, int requested, int *provided)
   impl_wrap_handle.mpi_so_handle = mpi_so_handle;
   impl_wrap_init_fnptr(&impl_wrap_handle);
 
-  MPI_Comm_rank = impl_wrap_handle.MPI_Comm_rank;
-  MPI_Comm_size = impl_wrap_handle.MPI_Comm_size;
-  MPI_Comm_dup = impl_wrap_handle.MPI_Comm_dup;
+  MPI_Comm_rank = impl_wrap_handle.WRAP_Comm_rank;
+  MPI_Comm_size = impl_wrap_handle.WRAP_Comm_size;
+  MPI_Comm_dup = impl_wrap_handle.WRAP_Comm_dup;
+  MPI_Comm_free = impl_wrap_handle.WRAP_Comm_free;
+  MPI_Comm_compare = impl_wrap_handle.WRAP_Comm_compare;
 
   return 0;
 }
@@ -126,13 +130,13 @@ int MPI_Init(int *argc, char ***argv)
 {
   int rc = 0;
   mpi_wrap_load(argc, argv, 0, NULL);
-  rc = impl_wrap_handle.MPI_Init(argc, argv);
+  rc = impl_wrap_handle.WRAP_Init(argc, argv);
   return rc;
 }
 
 int MPI_Finalize(void)
 {
-  int rc = impl_wrap_handle.MPI_Finalize();
+  int rc = impl_wrap_handle.WRAP_Finalize();
   mpi_wrap_unload();
   return rc;
 }
