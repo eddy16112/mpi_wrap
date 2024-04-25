@@ -16,6 +16,8 @@ int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
 int (*MPI_Comm_free)(MPI_Comm *comm) = nullptr;
 int (*MPI_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result) = nullptr;
 
+namespace MUK {
+
 static impl_wrap_handle_t impl_wrap_handle;
 
 static bool impl_wrap_handle_initialized = false;
@@ -135,15 +137,17 @@ static int mpi_wrap_unload(void)
   return 0;
 }
 
+};
+
 extern "C" {
 
 int MPI_Initialized(int *flag)
 {
-  if (!impl_wrap_handle_initialized) {
+  if (!MUK::impl_wrap_handle_initialized) {
     *flag = 0;
     return MPI_SUCCESS;
   } else {
-    int rc = impl_wrap_handle.WRAP_Initialized(flag);
+    int rc = MUK::impl_wrap_handle.WRAP_Initialized(flag);
     return rc;
   }
 }
@@ -151,33 +155,33 @@ int MPI_Initialized(int *flag)
 int MPI_Init(int *argc, char ***argv)
 {
   int rc = 0;
-  mpi_wrap_load(argc, argv, 0, NULL);
-  rc = impl_wrap_handle.WRAP_Init(argc, argv);
+  MUK::mpi_wrap_load(argc, argv, 0, NULL);
+  rc = MUK::impl_wrap_handle.WRAP_Init(argc, argv);
   return rc;
 }
 
 int MPI_Init_thread(int *argc, char ***argv, int required, int *provided)
 {
   int rc = 0;
-  mpi_wrap_load(argc, argv, 0, NULL);
-  rc = impl_wrap_handle.WRAP_Init_thread(argc, argv, required, provided);
+  MUK::mpi_wrap_load(argc, argv, 0, NULL);
+  rc = MUK::impl_wrap_handle.WRAP_Init_thread(argc, argv, required, provided);
   return rc;
 }
 
 int MPI_Finalize(void)
 {
-  int rc = impl_wrap_handle.WRAP_Finalize();
-  mpi_wrap_unload();
+  int rc = MUK::impl_wrap_handle.WRAP_Finalize();
+  MUK::mpi_wrap_unload();
   return rc;
 }
 
 int MPI_Finalized(int *flag)
 {
-  if (!impl_wrap_handle_initialized) {
+  if (!MUK::impl_wrap_handle_initialized) {
     *flag = 1;
     return MPI_SUCCESS;
   } else {
-    int rc = impl_wrap_handle.WRAP_Finalized(flag);
+    int rc = MUK::impl_wrap_handle.WRAP_Finalized(flag);
     return rc;
   }
 }
