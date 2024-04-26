@@ -49,6 +49,9 @@ namespace IMPL {
     int (*IMPL_Sendrecv)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag, MPI_Comm comm,
                          MPI_Status *status) = nullptr;
 
+    // collective
+    int (*IMPL_Barrier)(MPI_Comm comm) = nullptr;
+    
     int (*IMPL_Type_get_extent)(MPI_Datatype datatype, MPI_Aint *lb, MPI_Aint *extent) = nullptr;
     int (*IMPL_Get_processor_name)(char *name, int *resultlen) = nullptr;
 

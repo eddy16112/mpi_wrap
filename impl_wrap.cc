@@ -202,6 +202,13 @@ namespace IMPL {
     return rc;
   }
 
+  static int WRAP_Barrier(WRAP_Comm comm)
+  {
+    MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
+    int rc = impl_mpi_handle->IMPL_Barrier(impl_comm);
+    return rc;
+  }
+
   static int WRAP_Type_get_extent(WRAP_Datatype datatype, WRAP_Aint *lb, WRAP_Aint *extent)
   {
     MPI_Datatype impl_datatype = CONVERT_MPI_Datatype(datatype);
@@ -253,6 +260,8 @@ int impl_wrap_init(impl_wrap_handle_t *handle)
   handle->WRAP_Send = IMPL::WRAP_Send;
   handle->WRAP_Recv = IMPL::WRAP_Recv;
   handle->WRAP_Sendrecv = IMPL::WRAP_Sendrecv;
+
+  handle->WRAP_Barrier = IMPL::WRAP_Barrier;
 
   handle->WRAP_Type_get_extent = IMPL::WRAP_Type_get_extent;
 

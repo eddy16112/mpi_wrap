@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
     MPI_Comm_rank(comms[i], &me);
     MPI_Comm_size(comms[i], &np);
     printf("I am %d of %d, host %s, resultlen %d\n", me, np, name, resultlen);
+    MPI_Barrier(comms[i]);
   }
 
   int result;
