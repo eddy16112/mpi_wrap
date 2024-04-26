@@ -50,6 +50,7 @@ namespace IMPL {
                          MPI_Status *status) = nullptr;
 
     int (*IMPL_Type_get_extent)(MPI_Datatype datatype, MPI_Aint *lb, MPI_Aint *extent) = nullptr;
+    int (*IMPL_Get_processor_name)(char *name, int *resultlen) = nullptr;
 
   private:
     void *mpi_so_handle = nullptr;

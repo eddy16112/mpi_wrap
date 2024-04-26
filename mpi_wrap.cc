@@ -26,6 +26,7 @@ int (*MPI_Sendrecv)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, i
                          MPI_Status *status) = nullptr;
 
 int (*MPI_Type_get_extent)(MPI_Datatype datatype, MPI_Aint *lb, MPI_Aint *extent) = nullptr;
+int (*MPI_Get_processor_name)(char *name, int *resultlen) = nullptr;
 #ifdef __cplusplus
 }
 #endif
@@ -149,6 +150,7 @@ namespace MUK {
     MPI_Sendrecv = impl_wrap_handle.WRAP_Sendrecv;
 
     MPI_Type_get_extent = impl_wrap_handle.WRAP_Type_get_extent;
+    MPI_Get_processor_name = impl_wrap_handle.WRAP_Get_processor_name;
 
     impl_wrap_handle_initialized = true;
 

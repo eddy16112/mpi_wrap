@@ -241,6 +241,7 @@ int impl_wrap_init(impl_wrap_handle_t *handle)
   handle->WRAP_Query_thread = IMPL::impl_mpi_handle->IMPL_Query_thread;
   handle->WRAP_Finalize = IMPL::impl_mpi_handle->IMPL_Finalize;
   handle->WRAP_Finalized = IMPL::impl_mpi_handle->IMPL_Finalized;
+  handle->WRAP_Get_processor_name = IMPL::impl_mpi_handle->IMPL_Get_processor_name;
 
   // the following functions are not ABI stable, so we need a wrapper
   handle->WRAP_Comm_rank = IMPL::WRAP_Comm_rank;

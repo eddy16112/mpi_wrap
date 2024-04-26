@@ -45,6 +45,7 @@ typedef struct impl_wrap_handle_s {
                        WRAP_Status *status);
 
   int (*WRAP_Type_get_extent)(WRAP_Datatype datatype, WRAP_Aint *lb, WRAP_Aint *extent);
+  int (*WRAP_Get_processor_name)(char *name, int *resultlen);
 } impl_wrap_handle_t;
 
 #ifdef __cplusplus
