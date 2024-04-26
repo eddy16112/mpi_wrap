@@ -236,6 +236,12 @@ namespace IMPL {
 
   static int check_mpi_types(void)
   {
+    static_assert(std::is_pod<impl_wrap_handle_t>::value);
+    static_assert(std::is_pod<WRAP_Comm>::value);
+    static_assert(std::is_pod<WRAP_Datatype>::value);
+    static_assert(std::is_pod<WRAP_Op>::value);
+    static_assert(std::is_pod<WRAP_Status>::value);
+
     static_assert(sizeof(MPI_Aint) == sizeof(WRAP_Aint));
     static_assert(IMPL_MAX_LIBRARY_VERSION_STRING >= MPI_MAX_LIBRARY_VERSION_STRING);
 

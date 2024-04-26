@@ -19,6 +19,8 @@ else
     ifeq ($(OSID),ubuntu)
         CC=gcc
 		CXX=g++
+        # CC=clang
+		# CXX=clang++
     endif
     ifeq ($(OSID),fedora)
         CFLAGS=-fmax-errors=1 # GCC

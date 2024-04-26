@@ -121,10 +121,10 @@ namespace MUK {
     // int mpi_init_status = init_mpi(mpi_so_handle, argc, argv, requested, provided);
     int mpi_version = check_mpi_version(mpi_so_handle);
     if(mpi_version == IMPL_MPICH) {
-      impl_lib = "/scratch2/wwu/mpi_wrap/libimpl_mpich.so";
+      impl_lib = "./libimpl_mpich.so";
       printf("start mpich\n");
     } else if(mpi_version == IMPL_OMPI) {
-      impl_lib = "/scratch2/wwu/mpi_wrap/libimpl_ompi.so";
+      impl_lib = "./libimpl_ompi.so";
       printf("start ompi\n");
     }
 
