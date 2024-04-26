@@ -42,6 +42,7 @@ namespace IMPL {
     IMPL_Sendrecv = reinterpret_cast<int (*)(const void *, int, MPI_Datatype, int, int, void *, int, MPI_Datatype, int, int, MPI_Comm, MPI_Status *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Sendrecv"));
 
     IMPL_Allgather = reinterpret_cast<int (*)(const void *, int, MPI_Datatype, void *, int, MPI_Datatype, MPI_Comm)>(WRAP_DLSYM(mpi_so_handle, "MPI_Allgather"));
+    IMPL_Allgatherv = reinterpret_cast<int (*)(const void *, int, MPI_Datatype, void *, const int[], const int[], MPI_Datatype, MPI_Comm)>(WRAP_DLSYM(mpi_so_handle, "MPI_Allgatherv"));
     IMPL_Allreduce = reinterpret_cast<int (*)(const void *, void *, int, MPI_Datatype, MPI_Op, MPI_Comm)>(WRAP_DLSYM(mpi_so_handle, "MPI_Allreduce"));
     IMPL_Barrier = reinterpret_cast<int (*)(MPI_Comm)>(WRAP_DLSYM(mpi_so_handle, "MPI_Barrier"));
     IMPL_Bcast = reinterpret_cast<int (*)(void *, int, MPI_Datatype, int, MPI_Comm)>(WRAP_DLSYM(mpi_so_handle, "MPI_Bcast"));
