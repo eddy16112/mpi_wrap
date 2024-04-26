@@ -40,6 +40,8 @@ namespace IMPL {
     IMPL_Send = reinterpret_cast<int (*)(const void *, int, MPI_Datatype, int, int, MPI_Comm)>(WRAP_DLSYM(mpi_so_handle, "MPI_Send"));
     IMPL_Recv = reinterpret_cast<int (*)(void *, int, MPI_Datatype, int, int, MPI_Comm, MPI_Status *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Recv"));
     IMPL_Sendrecv = reinterpret_cast<int (*)(const void *, int, MPI_Datatype, int, int, void *, int, MPI_Datatype, int, int, MPI_Comm, MPI_Status *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Sendrecv"));
+
+    IMPL_Type_get_extent = reinterpret_cast<int (*)(MPI_Datatype, MPI_Aint *, MPI_Aint *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Type_get_extent"));
   }
 
   IMPL_MPI_Handle::~IMPL_MPI_Handle() {}

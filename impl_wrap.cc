@@ -182,7 +182,7 @@ namespace IMPL {
     return rc;
   }
 
-  int WRAP_Recv(void *buf, int count, WRAP_Datatype datatype, int source, int tag, WRAP_Comm comm, WRAP_Status *status)
+  static int WRAP_Recv(void *buf, int count, WRAP_Datatype datatype, int source, int tag, WRAP_Comm comm, WRAP_Status *status)
   {
     assert(status == WRAP_STATUS_IGNORE);
     MPI_Datatype impl_datatype = CONVERT_MPI_Datatype(datatype);
@@ -191,14 +191,21 @@ namespace IMPL {
     return rc;
   }
 
-  int WRAP_Sendrecv(const void *sendbuf, int sendcount, WRAP_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, WRAP_Datatype recvtype, int source, int recvtag, WRAP_Comm comm,
-                         WRAP_Status *status)
+  static int WRAP_Sendrecv(const void *sendbuf, int sendcount, WRAP_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, WRAP_Datatype recvtype, int source, int recvtag,
+                           WRAP_Comm comm, WRAP_Status *status)
   {
     assert(status == WRAP_STATUS_IGNORE);
     MPI_Datatype impl_sendtype = CONVERT_MPI_Datatype(sendtype);
     MPI_Datatype impl_recvtype = CONVERT_MPI_Datatype(recvtype);
     MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
     int rc = impl_mpi_handle->IMPL_Sendrecv(sendbuf, sendcount, impl_sendtype, dest, sendtag, recvbuf, recvcount, impl_recvtype, source, recvtag, impl_comm, MPI_STATUS_IGNORE);
+    return rc;
+  }
+
+  static int WRAP_Type_get_extent(WRAP_Datatype datatype, WRAP_Aint *lb, WRAP_Aint *extent)
+  {
+    MPI_Datatype impl_datatype = CONVERT_MPI_Datatype(datatype);
+    int rc = impl_mpi_handle->IMPL_Type_get_extent(impl_datatype, lb, extent);
     return rc;
   }
 
@@ -245,6 +252,8 @@ int impl_wrap_init(impl_wrap_handle_t *handle)
   handle->WRAP_Send = IMPL::WRAP_Send;
   handle->WRAP_Recv = IMPL::WRAP_Recv;
   handle->WRAP_Sendrecv = IMPL::WRAP_Sendrecv;
+
+  handle->WRAP_Type_get_extent = IMPL::WRAP_Type_get_extent;
 
   IMPL::impl_wrap_handle = handle;
 
