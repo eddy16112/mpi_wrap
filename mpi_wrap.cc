@@ -23,10 +23,11 @@ int (*MPI_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result) = nullptr;
 int (*MPI_Send)(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm) = nullptr;
 int (*MPI_Recv)(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status) = nullptr;
 int (*MPI_Sendrecv)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag, MPI_Comm comm,
-                         MPI_Status *status) = nullptr;
+                    MPI_Status *status) = nullptr;
 
 int (*MPI_Allreduce)(const void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) = nullptr;
 int (*MPI_Barrier)(MPI_Comm comm) = nullptr;
+int (*MPI_Bcast)(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm) = nullptr;
 
 int (*MPI_Type_get_extent)(MPI_Datatype datatype, MPI_Aint *lb, MPI_Aint *extent) = nullptr;
 int (*MPI_Get_processor_name)(char *name, int *resultlen) = nullptr;
@@ -154,6 +155,7 @@ namespace MUK {
 
     MPI_Allreduce = impl_wrap_handle.WRAP_Allreduce;
     MPI_Barrier = impl_wrap_handle.WRAP_Barrier;
+    MPI_Bcast = impl_wrap_handle.WRAP_Bcast;
 
     MPI_Type_get_extent = impl_wrap_handle.WRAP_Type_get_extent;
     MPI_Get_processor_name = impl_wrap_handle.WRAP_Get_processor_name;

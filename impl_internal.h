@@ -52,6 +52,7 @@ namespace IMPL {
     // collective
     int (*IMPL_Allreduce)(const void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) = nullptr;
     int (*IMPL_Barrier)(MPI_Comm comm) = nullptr;
+    int (*IMPL_Bcast)(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm) = nullptr;
 
     int (*IMPL_Type_get_extent)(MPI_Datatype datatype, MPI_Aint *lb, MPI_Aint *extent) = nullptr;
     int (*IMPL_Get_processor_name)(char *name, int *resultlen) = nullptr;

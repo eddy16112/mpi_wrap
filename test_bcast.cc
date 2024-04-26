@@ -17,44 +17,30 @@
 
 int main(int argc, char *argv[])
 {
-#ifdef USE_REAL_MPI
-  {
-    int resultlen;
-    char lib_version[MPI_MAX_LIBRARY_VERSION_STRING];
-    MPI_Get_library_version(lib_version, &resultlen);
-  }
-#endif
-
-  int rc, provided, flag;
-  MPI_Initialized(&flag);
-  assert(flag == 0);
+  int rc, provided;
   rc = MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
   assert(rc == MPI_SUCCESS);
-  MPI_Initialized(&flag);
-  assert(flag == 1);
-  MPI_Query_thread(&provided);
-  assert(provided == MPI_THREAD_MULTIPLE);
 
   int me, np;
-  MPI_Comm comms[2];
-  comms[0] = MPI_COMM_WORLD;
-  MPI_Comm_dup(comms[0], &(comms[1]));
-  for(int i = 0; i < 2; i++) {
-    MPI_Comm_rank(comms[i], &me);
-    MPI_Comm_size(comms[i], &np);
-    printf("I am %d of %d\n", me, np);
+  MPI_Comm comm;
+  MPI_Comm_dup(MPI_COMM_WORLD, &comm);
+  MPI_Comm_rank(comm, &me);
+  MPI_Comm_size(comm, &np);
+  printf("Bcast, I am %d of %d\n", me, np);
+
+  int SIZE = 100;
+
+  for (int i = 0; i < np; i++) {
+    int expected = i;
+    int *send_buf = init_array<int>(SIZE, me);
+    MPI_Bcast(send_buf, SIZE * sizeof(int), MPI_BYTE, i, comm);
+    check_array<int>(SIZE, send_buf, expected);
+
+    free(send_buf);
   }
 
-  int result;
-  MPI_Comm_compare(comms[0], comms[1], &result);
-  assert(result == MPI_CONGRUENT);
-  
-  MPI_Comm_free(&(comms[1]));
+  MPI_Comm_free(&comm);
 
-  MPI_Finalized(&flag);
-  assert(flag == 0);
   MPI_Finalize();
-  MPI_Finalized(&flag);
-  assert(flag == 1);
   return 0;
 }
