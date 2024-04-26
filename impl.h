@@ -37,6 +37,8 @@ typedef struct impl_wrap_handle_s {
   int (*WRAP_Comm_dup)(WRAP_Comm comm, WRAP_Comm *newcomm);
   int (*WRAP_Comm_free)(WRAP_Comm *comm);
   int (*WRAP_Comm_compare)(WRAP_Comm comm1, WRAP_Comm comm2, int *result);
+  int (*WRAP_Comm_split)(WRAP_Comm comm, int color, int key, WRAP_Comm *newcomm);
+  int (*WRAP_Comm_split_type)(WRAP_Comm comm, int split_type, int key, WRAP_Info info, WRAP_Comm *newcomm);
 
   // p2p
   int (*WRAP_Send)(const void *buf, int count, WRAP_Datatype datatype, int dest, int tag, WRAP_Comm comm);

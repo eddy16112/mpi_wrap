@@ -42,6 +42,8 @@ namespace IMPL {
     int (*IMPL_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
     int (*IMPL_Comm_free)(MPI_Comm *comm) = nullptr;
     int (*IMPL_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result) = nullptr;
+    int (*IMPL_Comm_split)(MPI_Comm comm, int color, int key, MPI_Comm *newcomm) = nullptr;
+    int (*IMPL_Comm_split_type)(MPI_Comm comm, int split_type, int key, MPI_Info info, MPI_Comm *newcomm) = nullptr;
 
     // p2p
     int (*IMPL_Send)(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm) = nullptr;

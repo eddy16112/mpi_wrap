@@ -20,6 +20,7 @@
 
 typedef WRAP_Comm MPI_Comm;
 typedef WRAP_Datatype MPI_Datatype;
+typedef WRAP_Info MPI_Info;
 typedef WRAP_Op MPI_Op;
 typedef WRAP_Status MPI_Status;
 
@@ -41,6 +42,9 @@ const MPI_Datatype MPI_UINT32_T = {.ip = WRAP_UINT32_T};
 const MPI_Datatype MPI_UINT64_T = {.ip = WRAP_UINT64_T};
 const MPI_Datatype MPI_BYTE = {.ip = WRAP_BYTE};
 
+// predefined info
+const MPI_Info MPI_INFO_NULL = {.ip = WRAP_INFO_NULL};
+
 // predefined ops
 const MPI_Op MPI_SUM = {.ip = WRAP_SUM};
 
@@ -50,12 +54,16 @@ const MPI_Op MPI_SUM = {.ip = WRAP_SUM};
 
 #define MPI_SUCCESS WRAP_SUCCESS
 
-#define MPI_CONGRUENT 1
+#define MPI_CONGRUENT WRAP_CONGRUENT
 
 #define MPI_THREAD_SINGLE WRAP_THREAD_SINGLE
 #define MPI_THREAD_FUNNELED WRAP_THREAD_FUNNELED
 #define MPI_THREAD_SERIALIZED WRAP_THREAD_SERIALIZED
 #define MPI_THREAD_MULTIPLE WRAP_THREAD_MULTIPLE
+
+#define MPI_COMM_TYPE_SHARED WRAP_COMM_TYPE_SHARED
+
+#define MPI_MAX_PROCESSOR_NAME          256
 
 typedef WRAP_Aint MPI_Aint;
 
@@ -79,6 +87,8 @@ extern int (*MPI_Comm_size)(MPI_Comm comm, int *size);
 extern int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm);
 extern int (*MPI_Comm_free)(MPI_Comm *comm);
 extern int (*MPI_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result);
+extern int (*MPI_Comm_split)(MPI_Comm comm, int color, int key, MPI_Comm *newcomm);
+extern int (*MPI_Comm_split_type)(MPI_Comm comm, int split_type, int key, MPI_Info info, MPI_Comm *newcomm);
 
 extern int (*MPI_Send)(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
 extern int (*MPI_Recv)(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);

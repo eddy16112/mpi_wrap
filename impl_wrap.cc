@@ -130,6 +130,42 @@ namespace IMPL {
     return wrap;
   }
 
+  static inline MPI_Info CONVERT_MPI_Info(WRAP_Info info)
+  {
+    if(info.ip == (intptr_t)WRAP_INFO_NULL) {
+      return MPI_INFO_NULL;
+    } else if(info.ip == (intptr_t)WRAP_INFO_ENV) {
+      return MPI_INFO_ENV;
+    } else {
+#ifdef USE_MPICH
+      return info.i;
+#elif USE_OMPI
+      return static_cast<MPI_Info>(info.p);
+#else
+#error NO ABI
+#endif
+    }
+  }
+
+  static inline WRAP_Info OUTPUT_MPI_Info(MPI_Info info)
+  {
+    WRAP_Info wrap = {0};
+    if(info == MPI_INFO_NULL) {
+      wrap.ip = (intptr_t)WRAP_INFO_NULL;
+    } else if(info == MPI_INFO_ENV) {
+      wrap.ip = (intptr_t)WRAP_INFO_ENV;
+    } else {
+#ifdef USE_MPICH
+      wrap.i = info;
+#elif USE_OMPI
+      wrap.p = static_cast<MPI_Info>(info);
+#else
+#error NO ABI
+#endif
+    }
+    return wrap;
+  }
+
   // the following functions are the wrapper of MPI functions
 
   static int WRAP_Comm_rank(WRAP_Comm comm, int *rank)
@@ -169,6 +205,34 @@ namespace IMPL {
     MPI_Comm WRAP_Comm1 = CONVERT_MPI_Comm(comm1);
     MPI_Comm WRAP_Comm2 = CONVERT_MPI_Comm(comm2);
     int rc = impl_mpi_handle->IMPL_Comm_compare(WRAP_Comm1, WRAP_Comm2, result);
+    return rc;
+  }
+
+  static int WRAP_Comm_split(WRAP_Comm comm, int color, int key, WRAP_Comm *newcomm)
+  {
+    MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
+    MPI_Comm impl_newcomm;
+    int rc = impl_mpi_handle->IMPL_Comm_split(impl_comm, color, key, &impl_newcomm);
+    *newcomm = OUTPUT_MPI_Comm(impl_newcomm);
+    return rc;
+  }
+
+  static int WRAP_Comm_split_type(WRAP_Comm comm, int split_type, int key, WRAP_Info info, WRAP_Comm *newcomm)
+  {
+    // this is the only place this conversion is required, so just inline it
+    int impl_type = MPI_UNDEFINED;
+    if(split_type == WRAP_COMM_TYPE_SHARED) {
+      impl_type = MPI_COMM_TYPE_SHARED;
+    } else {
+      fprintf(stdout, "unsupported split_type\n");
+      fflush(stdout);
+      abort();
+    }
+    MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
+    MPI_Info impl_info = CONVERT_MPI_Info(info);
+    MPI_Comm impl_newcomm;
+    int rc = impl_mpi_handle->IMPL_Comm_split_type(impl_comm, impl_type, key, impl_info, &impl_newcomm);
+    *newcomm = OUTPUT_MPI_Comm(impl_newcomm);
     return rc;
   }
 
@@ -332,6 +396,8 @@ int impl_wrap_init(impl_wrap_handle_t *handle)
   handle->WRAP_Comm_dup = IMPL::WRAP_Comm_dup;
   handle->WRAP_Comm_free = IMPL::WRAP_Comm_free;
   handle->WRAP_Comm_compare = IMPL::WRAP_Comm_compare;
+  handle->WRAP_Comm_split = IMPL::WRAP_Comm_split;
+  handle->WRAP_Comm_split_type = IMPL::WRAP_Comm_split_type;
 
   handle->WRAP_Send = IMPL::WRAP_Send;
   handle->WRAP_Recv = IMPL::WRAP_Recv;

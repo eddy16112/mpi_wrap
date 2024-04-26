@@ -27,16 +27,16 @@ typedef union {
   intptr_t ip;
 } IMPL_Handle;
 
-typedef struct
-{
-    int MPI_SOURCE;
-    int MPI_TAG;
-    int MPI_ERROR;
-    int __kielletty__[5];
+typedef struct {
+  int MPI_SOURCE;
+  int MPI_TAG;
+  int MPI_ERROR;
+  int __kielletty__[5];
 } WRAP_Status;
 
 typedef IMPL_Handle WRAP_Comm;
 typedef IMPL_Handle WRAP_Datatype;
+typedef IMPL_Handle WRAP_Info;
 typedef IMPL_Handle WRAP_Op;
 
 // predefined communicators
@@ -57,11 +57,15 @@ typedef IMPL_Handle WRAP_Op;
 #define WRAP_UINT64_T 25
 #define WRAP_BYTE 33
 
+// predefined info
+#define WRAP_INFO_NULL 0
+#define WRAP_INFO_ENV 1
+
 // predefined ops
 #define WRAP_SUM 3
 
 // predefined status
-#define WRAP_STATUS_IGNORE  0
+#define WRAP_STATUS_IGNORE 0
 
 // inplace
 #define WRAP_IN_PLACE 1
@@ -78,6 +82,18 @@ enum
   WRAP_THREAD_FUNNELED = 1,
   WRAP_THREAD_SERIALIZED = 2,
   WRAP_THREAD_MULTIPLE = 3
+};
+
+// Communicator split type constants
+enum
+{
+  WRAP_COMM_TYPE_SHARED = -100
+};
+
+// Results of communicator and group comparisons
+enum
+{
+  WRAP_CONGRUENT = 1
 };
 
 // error codes

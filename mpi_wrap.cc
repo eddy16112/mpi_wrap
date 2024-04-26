@@ -19,6 +19,8 @@ int (*MPI_Comm_size)(MPI_Comm comm, int *size) = nullptr;
 int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
 int (*MPI_Comm_free)(MPI_Comm *comm) = nullptr;
 int (*MPI_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result) = nullptr;
+int (*MPI_Comm_split)(MPI_Comm comm, int color, int key, MPI_Comm *newcomm) = nullptr;
+int (*MPI_Comm_split_type)(MPI_Comm comm, int split_type, int key, MPI_Info info, MPI_Comm *newcomm) = nullptr;
 
 int (*MPI_Send)(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm) = nullptr;
 int (*MPI_Recv)(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status) = nullptr;
@@ -128,10 +130,10 @@ namespace MUK {
     // int mpi_init_status = init_mpi(mpi_so_handle, argc, argv, requested, provided);
     int mpi_version = check_mpi_version(mpi_so_handle);
     if(mpi_version == IMPL_MPICH) {
-      impl_lib = "./libimpl_mpich.so";
+      impl_lib = "/scratch2/wwu/mpi_wrap/libimpl_mpich.so";
       printf("start mpich\n");
     } else if(mpi_version == IMPL_OMPI) {
-      impl_lib = "./libimpl_ompi.so";
+      impl_lib = "/scratch2/wwu/mpi_wrap/libimpl_ompi.so";
       printf("start ompi\n");
     }
 
@@ -154,6 +156,8 @@ namespace MUK {
     MPI_Comm_dup = impl_wrap_handle.WRAP_Comm_dup;
     MPI_Comm_free = impl_wrap_handle.WRAP_Comm_free;
     MPI_Comm_compare = impl_wrap_handle.WRAP_Comm_compare;
+    MPI_Comm_split = impl_wrap_handle.WRAP_Comm_split;
+    MPI_Comm_split_type = impl_wrap_handle.WRAP_Comm_split_type;
 
     MPI_Send = impl_wrap_handle.WRAP_Send;
     MPI_Recv = impl_wrap_handle.WRAP_Recv;
