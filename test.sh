@@ -10,7 +10,11 @@ MPICH_RUN=${MPICH_DIR}/bin/mpirun
 export MPI_LIB=0
 ${MPICH_RUN} -np 2 ./test_comm
 ${MPICH_RUN} -np 2 ./test_comm_c
+${MPICH_RUN} -np 2 ./test_pingpong
+${MPICH_RUN} -np 2 ./test_pingpong_c
 
 export MPI_LIB=1
 ${OMPI_RUN} -np 2 ./test_comm
 ${OMPI_RUN} -np 2 ./test_comm_c
+${OMPI_RUN} -np 2 ./test_pingpong
+${OMPI_RUN} -np 2 ./test_pingpong_c

@@ -35,6 +35,9 @@ typedef struct impl_wrap_handle_s {
   int (*WRAP_Comm_dup)(WRAP_Comm comm, WRAP_Comm *newcomm);
   int (*WRAP_Comm_free)(WRAP_Comm *comm);
   int (*WRAP_Comm_compare)(WRAP_Comm comm1, WRAP_Comm comm2, int *result);
+
+  int (*WRAP_Send)(const void *buf, int count, WRAP_Datatype datatype, int dest, int tag, WRAP_Comm comm);
+  int (*WRAP_Recv)(void *buf, int count, WRAP_Datatype datatype, int source, int tag, WRAP_Comm comm, WRAP_Status *status);
 } impl_wrap_handle_t;
 
 #ifdef __cplusplus

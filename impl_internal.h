@@ -41,6 +41,9 @@ namespace IMPL {
     int (*IMPL_Comm_free)(MPI_Comm *comm) = nullptr;
     int (*IMPL_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result) = nullptr;
 
+    int (*IMPL_Send)(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm) = nullptr;
+    int (*IMPL_Recv)(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status) = nullptr;
+
   private:
     void *mpi_so_handle = nullptr;
   };

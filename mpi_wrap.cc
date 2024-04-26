@@ -8,6 +8,10 @@
 #include <string>
 #include <cstring>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int (*MPI_Query_thread)(int *provided) = nullptr;
 
 int (*MPI_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
@@ -15,6 +19,13 @@ int (*MPI_Comm_size)(MPI_Comm comm, int *size) = nullptr;
 int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
 int (*MPI_Comm_free)(MPI_Comm *comm) = nullptr;
 int (*MPI_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result) = nullptr;
+
+int (*MPI_Send)(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm) = nullptr;
+int (*MPI_Recv)(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status) = nullptr;
+
+#ifdef __cplusplus
+}
+#endif
 
 namespace MUK {
 
@@ -129,6 +140,9 @@ namespace MUK {
     MPI_Comm_dup = impl_wrap_handle.WRAP_Comm_dup;
     MPI_Comm_free = impl_wrap_handle.WRAP_Comm_free;
     MPI_Comm_compare = impl_wrap_handle.WRAP_Comm_compare;
+
+    MPI_Send = impl_wrap_handle.WRAP_Send;
+    MPI_Recv = impl_wrap_handle.WRAP_Recv;
 
     impl_wrap_handle_initialized = true;
 

@@ -36,7 +36,9 @@ namespace IMPL {
     IMPL_Comm_dup = reinterpret_cast<int (*)(MPI_Comm, MPI_Comm *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_dup"));
     IMPL_Comm_free = reinterpret_cast<int (*)(MPI_Comm *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_free"));
     IMPL_Comm_compare = reinterpret_cast<int (*)(MPI_Comm, MPI_Comm, int *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Comm_compare"));
-    // IMPL_Comm_free = MPI_Comm_free;
+    
+    IMPL_Send = reinterpret_cast<int (*)(const void *, int, MPI_Datatype, int, int, MPI_Comm)>(WRAP_DLSYM(mpi_so_handle, "MPI_Send"));
+    IMPL_Recv = reinterpret_cast<int (*)(void *, int, MPI_Datatype, int, int, MPI_Comm, MPI_Status *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Recv"));
   }
 
   IMPL_MPI_Handle::~IMPL_MPI_Handle() {}

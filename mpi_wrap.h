@@ -19,12 +19,31 @@
 #include "impl_wrap_type.h"
 
 typedef WRAP_Comm MPI_Comm;
+typedef WRAP_Datatype MPI_Datatype;
+typedef WRAP_Status MPI_Status;
 
+// predefined communicators
 const MPI_Comm MPI_COMM_NULL = {.ip = WRAP_COMM_NULL};
 const MPI_Comm MPI_COMM_SELF = {.ip = WRAP_COMM_SELF};
 const MPI_Comm MPI_COMM_WORLD = {.ip = WRAP_COMM_WORLD};
 
-#define MPI_SUCCESS 0
+// predefined data types
+const MPI_Datatype MPI_CHAR = {.ip = WRAP_CHAR};
+const MPI_Datatype MPI_INT = {.ip = WRAP_INT};
+const MPI_Datatype MPI_UNSIGNED_LONG_LONG = {.ip = WRAP_UNSIGNED_LONG_LONG};
+const MPI_Datatype MPI_FLOAT = {.ip = WRAP_FLOAT};
+const MPI_Datatype MPI_DOUBLE = {.ip = WRAP_DOUBLE};
+const MPI_Datatype MPI_INT8_T = {.ip = WRAP_INT8_T};
+const MPI_Datatype MPI_INT64_T = {.ip = WRAP_INT64_T};
+const MPI_Datatype MPI_UINT8_T = {.ip = WRAP_UINT8_T};
+const MPI_Datatype MPI_UINT32_T = {.ip = WRAP_UINT32_T};
+const MPI_Datatype MPI_UINT64_T = {.ip = WRAP_UINT64_T};
+const MPI_Datatype MPI_BYTE = {.ip = WRAP_BYTE};
+
+// predefined status
+#define MPI_STATUS_IGNORE WRAP_STATUS_IGNORE
+
+#define MPI_SUCCESS WRAP_SUCCESS
 
 #define MPI_CONGRUENT 1
 
@@ -55,6 +74,9 @@ extern int (*MPI_Comm_size)(MPI_Comm comm, int *size);
 extern int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm);
 extern int (*MPI_Comm_free)(MPI_Comm *comm);
 extern int (*MPI_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result);
+
+extern int (*MPI_Send)(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
+extern int (*MPI_Recv)(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
 
 #ifdef __cplusplus
 }

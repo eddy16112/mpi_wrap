@@ -66,6 +66,70 @@ namespace IMPL {
     return wrap;
   }
 
+  static inline MPI_Datatype CONVERT_MPI_Datatype(WRAP_Datatype datatype)
+  {
+    if(datatype.ip == (intptr_t)WRAP_CHAR) {
+      return MPI_CHAR;
+    } else if(datatype.ip == (intptr_t)WRAP_INT) {
+      return MPI_INT;
+    } else if(datatype.ip == (intptr_t)WRAP_UNSIGNED_LONG_LONG) {
+      return MPI_UNSIGNED_LONG_LONG;
+    } else if(datatype.ip == (intptr_t)WRAP_FLOAT) {
+      return MPI_FLOAT;
+    } else if(datatype.ip == (intptr_t)WRAP_DOUBLE) {
+      return MPI_DOUBLE;
+    } else if(datatype.ip == (intptr_t)WRAP_INT8_T) {
+      return MPI_INT8_T;
+    } else if(datatype.ip == (intptr_t)WRAP_INT64_T) {
+      return MPI_INT64_T;
+    } else if(datatype.ip == (intptr_t)WRAP_UINT8_T) {
+      return MPI_UINT8_T;
+    } else if(datatype.ip == (intptr_t)WRAP_UINT32_T) {
+      return MPI_UINT32_T;
+    } else if(datatype.ip == (intptr_t)WRAP_UINT64_T) {
+      return MPI_UINT64_T;
+    } else if(datatype.ip == (intptr_t)WRAP_BYTE) {
+      return MPI_BYTE;
+    } else {
+      fprintf(stdout, "Unknown data type");
+      fflush(stdout);
+      assert(0);
+    }
+  }
+
+  static inline WRAP_Datatype OUTPUT_MPI_Datatype(MPI_Datatype datatype)
+  {
+    WRAP_Datatype wrap = {0};
+    if(datatype == MPI_CHAR) {
+      wrap.ip = (intptr_t)WRAP_CHAR;
+    } else if(datatype == MPI_INT) {
+      wrap.ip = (intptr_t)WRAP_INT;
+    } else if(datatype == MPI_UNSIGNED_LONG_LONG) {
+      wrap.ip = (intptr_t)WRAP_UNSIGNED_LONG_LONG;
+    } else if(datatype == MPI_FLOAT) {
+      wrap.ip = (intptr_t)WRAP_FLOAT;
+    } else if(datatype == MPI_DOUBLE) {
+      wrap.ip = (intptr_t)WRAP_DOUBLE;
+    } else if(datatype == MPI_INT8_T) {
+      wrap.ip = (intptr_t)WRAP_INT8_T;
+    } else if(datatype == MPI_INT64_T) {
+      wrap.ip = (intptr_t)WRAP_INT64_T;
+    } else if(datatype == MPI_UINT8_T) {
+      wrap.ip = (intptr_t)WRAP_UINT8_T;
+    } else if(datatype == MPI_UINT32_T) {
+      wrap.ip = (intptr_t)WRAP_UINT32_T;
+    } else if(datatype == MPI_UINT64_T) {
+      wrap.ip = (intptr_t)WRAP_UINT64_T;
+    } else if(datatype == MPI_BYTE) {
+      wrap.ip = (intptr_t)WRAP_BYTE;
+    } else {
+      fprintf(stdout, "Unknown data type");
+      fflush(stdout);
+      assert(0);
+    }
+    return wrap;
+  }
+
   // the following functions are the wrapper of MPI functions
 
   static int WRAP_Comm_rank(WRAP_Comm comm, int *rank)
@@ -108,6 +172,25 @@ namespace IMPL {
     return rc;
   }
 
+  static int WRAP_Send(const void *buf, int count, WRAP_Datatype datatype, int dest, int tag, WRAP_Comm comm)
+  {
+    // we do not support predefined ranks such as MPI_ANY_SOURCE
+    assert(dest >= 0);
+    MPI_Datatype impl_datatype = CONVERT_MPI_Datatype(datatype);
+    MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
+    int rc = impl_mpi_handle->IMPL_Send(buf, count, impl_datatype, dest, tag, impl_comm);
+    return rc;
+  }
+
+  int WRAP_Recv(void *buf, int count, WRAP_Datatype datatype, int source, int tag, WRAP_Comm comm, WRAP_Status *status)
+  {
+    assert(status == WRAP_STATUS_IGNORE);
+    MPI_Datatype impl_datatype = CONVERT_MPI_Datatype(datatype);
+    MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
+    int rc = impl_mpi_handle->IMPL_Recv(buf, count, impl_datatype, source, tag, impl_comm, MPI_STATUS_IGNORE);
+    return rc;
+  }
+
   static int check_mpi_types(void)
   {
     static_assert(sizeof(MPI_Aint) == sizeof(WRAP_Aint));
@@ -117,6 +200,8 @@ namespace IMPL {
     static_assert(static_cast<int>(WRAP_THREAD_FUNNELED) == static_cast<int>(MPI_THREAD_FUNNELED));
     static_assert(static_cast<int>(WRAP_THREAD_SERIALIZED) == static_cast<int>(MPI_THREAD_SERIALIZED));
     static_assert(static_cast<int>(WRAP_THREAD_MULTIPLE) == static_cast<int>(MPI_THREAD_MULTIPLE));
+
+    // static_assert(WRAP_STATUS_IGNORE == MPI_STATUS_IGNORE);
 
     return 0;
   }
@@ -145,6 +230,9 @@ int impl_wrap_init(impl_wrap_handle_t *handle)
   handle->WRAP_Comm_dup = IMPL::WRAP_Comm_dup;
   handle->WRAP_Comm_free = IMPL::WRAP_Comm_free;
   handle->WRAP_Comm_compare = IMPL::WRAP_Comm_compare;
+
+  handle->WRAP_Send = IMPL::WRAP_Send;
+  handle->WRAP_Recv = IMPL::WRAP_Recv;
 
   IMPL::impl_wrap_handle = handle;
 

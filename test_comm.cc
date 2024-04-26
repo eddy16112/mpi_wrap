@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: MIT
-
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -28,6 +26,7 @@ int main(int argc, char *argv[])
   MPI_Initialized(&flag);
   assert(flag == 0);
   rc = MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+  assert(rc == MPI_SUCCESS);
   MPI_Initialized(&flag);
   assert(flag == 1);
   MPI_Query_thread(&provided);
@@ -45,7 +44,7 @@ int main(int argc, char *argv[])
 
   int result;
   MPI_Comm_compare(comms[0], comms[1], &result);
-  printf("compare result %d\n", result);
+  assert(result == MPI_CONGRUENT);
   
   MPI_Comm_free(&(comms[1]));
 
@@ -54,5 +53,5 @@ int main(int argc, char *argv[])
   MPI_Finalize();
   MPI_Finalized(&flag);
   assert(flag == 1);
-  return rc;
+  return 0;
 }
