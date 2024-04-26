@@ -28,7 +28,7 @@ void check_array(size_t size, T *buffer, T expected)
 {
   for(size_t i = 0; i < size; i++) {
     if(buffer[i] != expected + (T)i) {
-      std::cout << "wrong i " << i << ", expected " << expected << ", actual " << buffer[i] << std::endl << std::flush;
+      std::cout << "wrong i " << i << ", expected " << expected + (T)i << ", actual " << buffer[i] << std::endl << std::flush;
       assert(0);
     }
   }

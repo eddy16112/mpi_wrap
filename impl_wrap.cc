@@ -125,7 +125,7 @@ namespace IMPL {
     } else {
       fprintf(stdout, "Unknown data type");
       fflush(stdout);
-      assert(0);
+      abort();
     }
     return wrap;
   }
@@ -202,6 +202,24 @@ namespace IMPL {
     return rc;
   }
 
+  static int WRAP_Allreduce(const void *sendbuf, void *recvbuf, int count, WRAP_Datatype datatype, WRAP_Op op, WRAP_Comm comm)
+  {
+    // we do not have a use case of inplace
+    assert((intptr_t)sendbuf != WRAP_IN_PLACE);
+    MPI_Datatype impl_datatype = CONVERT_MPI_Datatype(datatype);
+    MPI_Op impl_op;
+    if(op.ip == (intptr_t)WRAP_SUM) {
+      impl_op = MPI_SUM;
+    } else {
+      fprintf(stdout, "unsupported op\n");
+      fflush(stdout);
+      abort();
+    }
+    MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
+    int rc = impl_mpi_handle->IMPL_Allreduce(sendbuf, recvbuf, count, impl_datatype, impl_op, impl_comm);
+    return rc;
+  }
+
   static int WRAP_Barrier(WRAP_Comm comm)
   {
     MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
@@ -261,6 +279,7 @@ int impl_wrap_init(impl_wrap_handle_t *handle)
   handle->WRAP_Recv = IMPL::WRAP_Recv;
   handle->WRAP_Sendrecv = IMPL::WRAP_Sendrecv;
 
+  handle->WRAP_Allreduce = IMPL::WRAP_Allreduce;
   handle->WRAP_Barrier = IMPL::WRAP_Barrier;
 
   handle->WRAP_Type_get_extent = IMPL::WRAP_Type_get_extent;

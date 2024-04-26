@@ -45,7 +45,8 @@ typedef struct impl_wrap_handle_s {
                        WRAP_Status *status);
 
   // collective
-  int (*WRAP_Barrier)(WRAP_Comm comm) = nullptr;
+  int (*WRAP_Allreduce)(const void *sendbuf, void *recvbuf, int count, WRAP_Datatype datatype, WRAP_Op op, WRAP_Comm comm);
+  int (*WRAP_Barrier)(WRAP_Comm comm);
 
   int (*WRAP_Type_get_extent)(WRAP_Datatype datatype, WRAP_Aint *lb, WRAP_Aint *extent);
   int (*WRAP_Get_processor_name)(char *name, int *resultlen);

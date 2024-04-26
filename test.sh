@@ -14,6 +14,7 @@ ${MPICH_RUN} -np 2 ./test_comm_c
 ${MPICH_RUN} -np 2 ./test_pingpong
 ${MPICH_RUN} -np 2 ./test_pingpong_c
 ${MPICH_RUN} -np 4 ./test_sendrecv
+${MPICH_RUN} -np 4 ./test_allreduce
 
 export MPI_LIB=1
 ${OMPI_RUN} -np 2 ./test_type
@@ -22,3 +23,4 @@ ${OMPI_RUN} -np 2 ./test_comm_c
 ${OMPI_RUN} -np 2 ./test_pingpong
 ${OMPI_RUN} -np 2 ./test_pingpong_c
 ${OMPI_RUN} -np 4 ./test_sendrecv
+${OMPI_RUN} -np 4 ./test_allreduce

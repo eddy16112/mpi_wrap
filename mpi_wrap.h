@@ -20,6 +20,7 @@
 
 typedef WRAP_Comm MPI_Comm;
 typedef WRAP_Datatype MPI_Datatype;
+typedef WRAP_Op MPI_Op;
 typedef WRAP_Status MPI_Status;
 
 // predefined communicators
@@ -40,8 +41,12 @@ const MPI_Datatype MPI_UINT32_T = {.ip = WRAP_UINT32_T};
 const MPI_Datatype MPI_UINT64_T = {.ip = WRAP_UINT64_T};
 const MPI_Datatype MPI_BYTE = {.ip = WRAP_BYTE};
 
+// predefined ops
+const MPI_Op MPI_SUM = {.ip = WRAP_SUM};
+
 // predefined status
 #define MPI_STATUS_IGNORE WRAP_STATUS_IGNORE
+#define MPI_IN_PLACE WRAP_IN_PLACE
 
 #define MPI_SUCCESS WRAP_SUCCESS
 
@@ -80,6 +85,7 @@ extern int (*MPI_Recv)(void *buf, int count, MPI_Datatype datatype, int source, 
 extern int (*MPI_Sendrecv)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag,
                            MPI_Comm comm, MPI_Status *status);
 
+extern int (*MPI_Allreduce)(const void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm);
 extern int (*MPI_Barrier)(MPI_Comm comm);
 
 extern int (*MPI_Type_get_extent)(MPI_Datatype datatype, MPI_Aint *lb, MPI_Aint *extent);

@@ -37,6 +37,7 @@ typedef struct
 
 typedef IMPL_Handle WRAP_Comm;
 typedef IMPL_Handle WRAP_Datatype;
+typedef IMPL_Handle WRAP_Op;
 
 // predefined communicators
 #define WRAP_COMM_NULL 0
@@ -56,8 +57,14 @@ typedef IMPL_Handle WRAP_Datatype;
 #define WRAP_UINT64_T 25
 #define WRAP_BYTE 33
 
+// predefined ops
+#define WRAP_SUM 3
+
 // predefined status
-#define WRAP_STATUS_IGNORE  NULL
+#define WRAP_STATUS_IGNORE  0
+
+// inplace
+#define WRAP_IN_PLACE 1
 
 typedef long int WRAP_Aint;
 
