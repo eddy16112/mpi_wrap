@@ -25,6 +25,7 @@ int (*MPI_Recv)(void *buf, int count, MPI_Datatype datatype, int source, int tag
 int (*MPI_Sendrecv)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag, MPI_Comm comm,
                     MPI_Status *status) = nullptr;
 
+int (*MPI_Allgather)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm) = nullptr;
 int (*MPI_Allreduce)(const void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) = nullptr;
 int (*MPI_Barrier)(MPI_Comm comm) = nullptr;
 int (*MPI_Bcast)(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm) = nullptr;
@@ -153,6 +154,7 @@ namespace MUK {
     MPI_Recv = impl_wrap_handle.WRAP_Recv;
     MPI_Sendrecv = impl_wrap_handle.WRAP_Sendrecv;
 
+    MPI_Allgather = impl_wrap_handle.WRAP_Allgather;
     MPI_Allreduce = impl_wrap_handle.WRAP_Allreduce;
     MPI_Barrier = impl_wrap_handle.WRAP_Barrier;
     MPI_Bcast = impl_wrap_handle.WRAP_Bcast;

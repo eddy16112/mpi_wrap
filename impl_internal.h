@@ -50,6 +50,7 @@ namespace IMPL {
                          MPI_Status *status) = nullptr;
 
     // collective
+    int (*IMPL_Allgather)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm) = nullptr;
     int (*IMPL_Allreduce)(const void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) = nullptr;
     int (*IMPL_Barrier)(MPI_Comm comm) = nullptr;
     int (*IMPL_Bcast)(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm) = nullptr;

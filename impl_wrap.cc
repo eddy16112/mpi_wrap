@@ -202,6 +202,17 @@ namespace IMPL {
     return rc;
   }
 
+  static int WRAP_Allgather(const void *sendbuf, int sendcount, WRAP_Datatype sendtype, void *recvbuf, int recvcount, WRAP_Datatype recvtype, WRAP_Comm comm)
+  {
+    // we do not have a use case of inplace
+    assert((intptr_t)sendbuf != WRAP_IN_PLACE);
+    MPI_Datatype impl_sendtype = CONVERT_MPI_Datatype(sendtype);
+    MPI_Datatype impl_recvtype = CONVERT_MPI_Datatype(recvtype);
+    MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
+    int rc = impl_mpi_handle->IMPL_Allgather(sendbuf, sendcount, impl_sendtype, recvbuf, recvcount, impl_recvtype, impl_comm);
+    return rc;
+  }
+
   static int WRAP_Allreduce(const void *sendbuf, void *recvbuf, int count, WRAP_Datatype datatype, WRAP_Op op, WRAP_Comm comm)
   {
     // we do not have a use case of inplace
@@ -293,6 +304,7 @@ int impl_wrap_init(impl_wrap_handle_t *handle)
   handle->WRAP_Recv = IMPL::WRAP_Recv;
   handle->WRAP_Sendrecv = IMPL::WRAP_Sendrecv;
 
+  handle->WRAP_Allgather = IMPL::WRAP_Allgather;
   handle->WRAP_Allreduce = IMPL::WRAP_Allreduce;
   handle->WRAP_Barrier = IMPL::WRAP_Barrier;
   handle->WRAP_Bcast = IMPL::WRAP_Bcast;
