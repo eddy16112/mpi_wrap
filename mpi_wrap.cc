@@ -22,6 +22,8 @@ int (*MPI_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result) = nullptr;
 
 int (*MPI_Send)(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm) = nullptr;
 int (*MPI_Recv)(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status) = nullptr;
+int (*MPI_Sendrecv)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag, MPI_Comm comm,
+                         MPI_Status *status) = nullptr;
 
 #ifdef __cplusplus
 }
@@ -143,6 +145,7 @@ namespace MUK {
 
     MPI_Send = impl_wrap_handle.WRAP_Send;
     MPI_Recv = impl_wrap_handle.WRAP_Recv;
+    MPI_Sendrecv = impl_wrap_handle.WRAP_Sendrecv;
 
     impl_wrap_handle_initialized = true;
 

@@ -77,6 +77,8 @@ extern int (*MPI_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result);
 
 extern int (*MPI_Send)(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
 extern int (*MPI_Recv)(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
+extern int (*MPI_Sendrecv)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag,
+                           MPI_Comm comm, MPI_Status *status);
 
 #ifdef __cplusplus
 }

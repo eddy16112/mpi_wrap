@@ -38,6 +38,8 @@ typedef struct impl_wrap_handle_s {
 
   int (*WRAP_Send)(const void *buf, int count, WRAP_Datatype datatype, int dest, int tag, WRAP_Comm comm);
   int (*WRAP_Recv)(void *buf, int count, WRAP_Datatype datatype, int source, int tag, WRAP_Comm comm, WRAP_Status *status);
+  int (*WRAP_Sendrecv)(const void *sendbuf, int sendcount, WRAP_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, WRAP_Datatype recvtype, int source, int recvtag, WRAP_Comm comm,
+                       WRAP_Status *status);
 } impl_wrap_handle_t;
 
 #ifdef __cplusplus

@@ -44,7 +44,7 @@ SOLIBS =
 AR      = ar
 ARFLAGS = -r
 
-RUNTESTS = test_comm test_comm_c test_pingpong test_pingpong_c
+RUNTESTS = test_comm test_comm_c test_pingpong test_pingpong_c test_sendrecv
 
 all: libs $(RUNTESTS)
 
@@ -61,6 +61,9 @@ test_pingpong: test_pingpong.cc libmpi_wrap.$(SO) mpi_wrap.h
 
 test_pingpong_c: test_pingpong.c libmpi_wrap.$(SO) mpi_wrap.h
 	$(CC) $(CFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
+
+test_sendrecv: test_sendrecv.cc libmpi_wrap.$(SO) mpi_wrap.h
+	$(CXX) $(CXXFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
 MPI_H =
 
