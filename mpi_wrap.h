@@ -91,6 +91,7 @@ extern int (*MPI_Allreduce)(const void *sendbuf, void *recvbuf, int count, MPI_D
 extern int (*MPI_Alltoall)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm);
 extern int (*MPI_Barrier)(MPI_Comm comm);
 extern int (*MPI_Bcast)(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm);
+extern int (*MPI_Gather)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm);
 
 extern int (*MPI_Type_get_extent)(MPI_Datatype datatype, MPI_Aint *lb, MPI_Aint *extent);
 extern int (*MPI_Get_processor_name)(char *name, int *resultlen);

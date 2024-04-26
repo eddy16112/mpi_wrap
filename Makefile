@@ -46,7 +46,7 @@ SOLIBS =
 AR      = ar
 ARFLAGS = -r
 
-RUNTESTS = test_comm test_comm_c test_pingpong test_pingpong_c test_sendrecv test_type test_allreduce test_bcast test_allgather test_alltoall
+RUNTESTS = test_comm test_comm_c test_pingpong test_pingpong_c test_sendrecv test_type test_allreduce test_bcast test_allgather test_alltoall test_gather
 
 all: libs $(RUNTESTS)
 
@@ -80,6 +80,9 @@ test_allgather: test_allgather.cc libmpi_wrap.$(SO) mpi_wrap.h
 	$(CXX) $(CXXFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
 test_alltoall: test_alltoall.cc libmpi_wrap.$(SO) mpi_wrap.h
+	$(CXX) $(CXXFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
+
+test_gather: test_gather.cc libmpi_wrap.$(SO) mpi_wrap.h
 	$(CXX) $(CXXFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
 MPI_H =

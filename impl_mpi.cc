@@ -47,6 +47,7 @@ namespace IMPL {
     IMPL_Alltoall = reinterpret_cast<int (*)(const void *, int, MPI_Datatype, void *, int, MPI_Datatype, MPI_Comm)>(WRAP_DLSYM(mpi_so_handle, "MPI_Alltoall"));
     IMPL_Barrier = reinterpret_cast<int (*)(MPI_Comm)>(WRAP_DLSYM(mpi_so_handle, "MPI_Barrier"));
     IMPL_Bcast = reinterpret_cast<int (*)(void *, int, MPI_Datatype, int, MPI_Comm)>(WRAP_DLSYM(mpi_so_handle, "MPI_Bcast"));
+    IMPL_Gather = reinterpret_cast<int (*)(const void *, int, MPI_Datatype, void *, int, MPI_Datatype, int, MPI_Comm)>(WRAP_DLSYM(mpi_so_handle, "MPI_Gather"));
 
     IMPL_Type_get_extent = reinterpret_cast<int (*)(MPI_Datatype, MPI_Aint *, MPI_Aint *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Type_get_extent"));
     IMPL_Get_processor_name = reinterpret_cast<int (*)(char *, int *)>(WRAP_DLSYM(mpi_so_handle, "MPI_Get_processor_name"));
