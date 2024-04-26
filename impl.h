@@ -48,6 +48,7 @@ typedef struct impl_wrap_handle_s {
   int (*WRAP_Allgather)(const void *sendbuf, int sendcount, WRAP_Datatype sendtype, void *recvbuf, int recvcount, WRAP_Datatype recvtype, WRAP_Comm comm);
   int (*WRAP_Allgatherv)(const void *sendbuf, int sendcount, WRAP_Datatype sendtype, void *recvbuf, const int recvcounts[], const int displs[], WRAP_Datatype recvtype, WRAP_Comm comm);
   int (*WRAP_Allreduce)(const void *sendbuf, void *recvbuf, int count, WRAP_Datatype datatype, WRAP_Op op, WRAP_Comm comm);
+  int (*WRAP_Alltoall)(const void *sendbuf, int sendcount, WRAP_Datatype sendtype, void *recvbuf, int recvcount, WRAP_Datatype recvtype, WRAP_Comm comm);
   int (*WRAP_Barrier)(WRAP_Comm comm);
   int (*WRAP_Bcast)(void *buffer, int count, WRAP_Datatype datatype, int root, WRAP_Comm comm);
 

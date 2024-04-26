@@ -17,6 +17,7 @@ ${MPICH_RUN} -np 4 ./test_sendrecv
 ${MPICH_RUN} -np 4 ./test_allreduce
 ${MPICH_RUN} -np 4 ./test_bcast
 ${MPICH_RUN} -np 4 ./test_allgather
+${MPICH_RUN} -np 3 ./test_alltoall
 
 export MPI_LIB=1
 ${OMPI_RUN} -np 2 ./test_type
@@ -28,3 +29,4 @@ ${OMPI_RUN} -np 4 ./test_sendrecv
 ${OMPI_RUN} -np 4 ./test_allreduce
 ${OMPI_RUN} -np 4 ./test_bcast
 ${OMPI_RUN} -np 4 ./test_allgather
+${OMPI_RUN} -np 3 ./test_alltoall
