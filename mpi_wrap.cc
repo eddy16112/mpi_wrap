@@ -45,6 +45,10 @@ namespace MUK {
 
   static bool impl_wrap_handle_initialized = false;
 
+  // -1: unknown, 0: false, 1:true
+  static int mpi_initialized = -1;
+  static int mpi_finalized = -1;
+
   static void *wrap_so_handle = nullptr;
 
   static void *mpi_so_handle = nullptr;
@@ -102,11 +106,9 @@ namespace MUK {
     return mpi_version;
   }
 
-  static int mpi_wrap_load(int *argc, char ***argv, int requested, int *provided)
+  static int mpi_wrap_load(void)
   {
-    if(impl_wrap_handle_initialized) {
-      return 0;
-    }
+    assert(!impl_wrap_handle_initialized);
 
     char *env = getenv("MPI_LIB");
     int version = atoi(env);
@@ -191,10 +193,14 @@ extern "C" {
 
 int MPI_Initialized(int *flag)
 {
-  if(!MUK::impl_wrap_handle_initialized) {
+  if (MUK::mpi_initialized == 1) {
+    *flag = 1;
+    return MPI_SUCCESS;
+  } else if (MUK::mpi_initialized == 0) {
     *flag = 0;
     return MPI_SUCCESS;
   } else {
+    MUK::mpi_wrap_load();
     int rc = MUK::impl_wrap_handle.WRAP_Initialized(flag);
     return rc;
   }
@@ -203,32 +209,47 @@ int MPI_Initialized(int *flag)
 int MPI_Init(int *argc, char ***argv)
 {
   int rc = 0;
-  MUK::mpi_wrap_load(argc, argv, 0, NULL);
+  if (!MUK::impl_wrap_handle_initialized) {
+    MUK::mpi_wrap_load();
+  }
   rc = MUK::impl_wrap_handle.WRAP_Init(argc, argv);
+  MUK::mpi_initialized = 1;
   return rc;
 }
 
 int MPI_Init_thread(int *argc, char ***argv, int required, int *provided)
 {
   int rc = 0;
-  MUK::mpi_wrap_load(argc, argv, 0, NULL);
+  if (!MUK::impl_wrap_handle_initialized) {
+    MUK::mpi_wrap_load();
+  }
   rc = MUK::impl_wrap_handle.WRAP_Init_thread(argc, argv, required, provided);
+  MUK::mpi_initialized = 1;
   return rc;
 }
 
 int MPI_Finalize(void)
 {
+  assert(MUK::impl_wrap_handle_initialized);
   int rc = MUK::impl_wrap_handle.WRAP_Finalize();
+  MUK::mpi_initialized = 0;
+  MUK::mpi_finalized = 1;
   MUK::mpi_wrap_unload();
   return rc;
 }
 
 int MPI_Finalized(int *flag)
 {
-  if(!MUK::impl_wrap_handle_initialized) {
+  if (MUK::mpi_finalized == 1) {
     *flag = 1;
     return MPI_SUCCESS;
+  } else if (MUK::mpi_finalized == 0) {
+    *flag = 0;
+    return MPI_SUCCESS;
   } else {
+    if (!MUK::impl_wrap_handle_initialized) {
+      MUK::mpi_wrap_load();
+    }
     int rc = MUK::impl_wrap_handle.WRAP_Finalized(flag);
     return rc;
   }
