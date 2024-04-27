@@ -268,6 +268,7 @@ namespace IMPL {
 
   static int WRAP_Allgather(const void *sendbuf, int sendcount, WRAP_Datatype sendtype, void *recvbuf, int recvcount, WRAP_Datatype recvtype, WRAP_Comm comm)
   {
+    printf("allgather\n");
     // we do not have a use case of inplace
     assert((intptr_t)sendbuf != WRAP_IN_PLACE);
     MPI_Datatype impl_sendtype = CONVERT_MPI_Datatype(sendtype);
@@ -279,6 +280,7 @@ namespace IMPL {
 
   static int WRAP_Allgatherv(const void *sendbuf, int sendcount, WRAP_Datatype sendtype, void *recvbuf, const int recvcounts[], const int displs[], WRAP_Datatype recvtype, WRAP_Comm comm)
   {
+    printf("allgatherv\n");
     // we do not have a use case of inplace
     assert((intptr_t)sendbuf != WRAP_IN_PLACE);
     MPI_Datatype impl_sendtype = CONVERT_MPI_Datatype(sendtype);
@@ -308,6 +310,7 @@ namespace IMPL {
 
   static int WRAP_Alltoall(const void *sendbuf, int sendcount, WRAP_Datatype sendtype, void *recvbuf, int recvcount, WRAP_Datatype recvtype, WRAP_Comm comm)
   {
+    printf("alltoall\n");
     // we do not have a use case of inplace
     assert((intptr_t)sendbuf != WRAP_IN_PLACE);
     MPI_Datatype impl_sendtype = CONVERT_MPI_Datatype(sendtype);
@@ -319,6 +322,7 @@ namespace IMPL {
 
   static int WRAP_Barrier(WRAP_Comm comm)
   {
+    printf("barrier\n");
     MPI_Comm impl_comm = CONVERT_MPI_Comm(comm);
     int rc = impl_mpi_handle->IMPL_Barrier(impl_comm);
     return rc;

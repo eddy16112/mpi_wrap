@@ -25,22 +25,22 @@ typedef WRAP_Op MPI_Op;
 typedef WRAP_Status MPI_Status;
 
 // predefined communicators
-const MPI_Comm MPI_COMM_NULL = {.ip = WRAP_COMM_NULL};
-const MPI_Comm MPI_COMM_SELF = {.ip = WRAP_COMM_SELF};
-const MPI_Comm MPI_COMM_WORLD = {.ip = WRAP_COMM_WORLD};
+#define MPI_COMM_NULL (MPI_Comm){.ip = WRAP_COMM_NULL}
+#define MPI_COMM_SELF (MPI_Comm){.ip = WRAP_COMM_SELF}
+#define MPI_COMM_WORLD (MPI_Comm){.ip = WRAP_COMM_WORLD}
 
 // predefined data types
-const MPI_Datatype MPI_CHAR = {.ip = WRAP_CHAR};
-const MPI_Datatype MPI_INT = {.ip = WRAP_INT};
-const MPI_Datatype MPI_UNSIGNED_LONG_LONG = {.ip = WRAP_UNSIGNED_LONG_LONG};
-const MPI_Datatype MPI_FLOAT = {.ip = WRAP_FLOAT};
-const MPI_Datatype MPI_DOUBLE = {.ip = WRAP_DOUBLE};
-const MPI_Datatype MPI_INT8_T = {.ip = WRAP_INT8_T};
-const MPI_Datatype MPI_INT64_T = {.ip = WRAP_INT64_T};
-const MPI_Datatype MPI_UINT8_T = {.ip = WRAP_UINT8_T};
-const MPI_Datatype MPI_UINT32_T = {.ip = WRAP_UINT32_T};
-const MPI_Datatype MPI_UINT64_T = {.ip = WRAP_UINT64_T};
-const MPI_Datatype MPI_BYTE = {.ip = WRAP_BYTE};
+#define MPI_CHAR (MPI_Datatype){.ip = WRAP_CHAR}
+#define MPI_INT (MPI_Datatype){.ip = WRAP_INT}
+#define MPI_UNSIGNED_LONG_LONG (MPI_Datatype){.ip = WRAP_UNSIGNED_LONG_LONG}
+#define MPI_FLOAT (MPI_Datatype){.ip = WRAP_FLOAT}
+#define MPI_DOUBLE (MPI_Datatype){.ip = WRAP_DOUBLE}
+#define MPI_INT8_T (MPI_Datatype){.ip = WRAP_INT8_T}
+#define MPI_INT64_T (MPI_Datatype){.ip = WRAP_INT64_T}
+#define MPI_UINT8_T (MPI_Datatype){.ip = WRAP_UINT8_T}
+#define MPI_UINT32_T (MPI_Datatype){.ip = WRAP_UINT32_T}
+#define MPI_UINT64_T (MPI_Datatype){.ip = WRAP_UINT64_T}
+#define MPI_BYTE (MPI_Datatype){.ip = WRAP_BYTE}
 
 // predefined info
 const MPI_Info MPI_INFO_NULL = {.ip = WRAP_INFO_NULL};
@@ -63,7 +63,7 @@ const MPI_Op MPI_SUM = {.ip = WRAP_SUM};
 
 #define MPI_COMM_TYPE_SHARED WRAP_COMM_TYPE_SHARED
 
-#define MPI_MAX_PROCESSOR_NAME          256
+#define MPI_MAX_PROCESSOR_NAME 256
 
 typedef WRAP_Aint MPI_Aint;
 

@@ -60,6 +60,8 @@ int main(int argc, char *argv[])
     MPI_Barrier(comms[i]);
   }
 
+  // assert(comms[0] == (MPI_Comm)MPI_COMM_WORLD);
+
   int result;
   MPI_Comm_compare(comms[0], comms[1], &result);
   assert(result == MPI_CONGRUENT);

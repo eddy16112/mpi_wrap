@@ -45,6 +45,9 @@ int main(int argc, char *argv[])
     printf("I am %d of %d\n", me, np);
   }
 
+  // test the compilation
+  // assert(comms[0] == MPI_COMM_WORLD);
+
   int result;
   MPI_Comm_compare(comms[0], comms[1], &result);
   assert(result == MPI_CONGRUENT);
