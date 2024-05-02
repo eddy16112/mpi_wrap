@@ -52,37 +52,37 @@ all: libs $(RUNTESTS)
 
 libs: libmpi_wrap.a libmpi_wrap.$(SO) libimpl_mpich.$(SO) libimpl_ompi.$(SO)
 
-test_comm: test_comm.cc libmpi_wrap.$(SO) mpi_wrap.h
+test_comm: test_comm.cc libmpi_wrap.$(SO) muk.h
 	$(CXX) $(CXXFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
-test_comm_c: test_comm.c libmpi_wrap.$(SO) mpi_wrap.h
+test_comm_c: test_comm.c libmpi_wrap.$(SO) muk.h
 	$(CC) $(CFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
-test_pingpong: test_pingpong.cc libmpi_wrap.$(SO) mpi_wrap.h
+test_pingpong: test_pingpong.cc libmpi_wrap.$(SO) muk.h
 	$(CXX) $(CXXFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
-test_pingpong_c: test_pingpong.c libmpi_wrap.$(SO) mpi_wrap.h
+test_pingpong_c: test_pingpong.c libmpi_wrap.$(SO) muk.h
 	$(CC) $(CFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
-test_sendrecv: test_sendrecv.cc libmpi_wrap.$(SO) mpi_wrap.h
+test_sendrecv: test_sendrecv.cc libmpi_wrap.$(SO) muk.h
 	$(CXX) $(CXXFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
-test_type: test_type.cc libmpi_wrap.$(SO) mpi_wrap.h
+test_type: test_type.cc libmpi_wrap.$(SO) muk.h
 	$(CXX) $(CXXFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
-test_allreduce: test_allreduce.cc libmpi_wrap.$(SO) mpi_wrap.h
+test_allreduce: test_allreduce.cc libmpi_wrap.$(SO) muk.h
 	$(CXX) $(CXXFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
-test_bcast: test_bcast.cc libmpi_wrap.$(SO) mpi_wrap.h
+test_bcast: test_bcast.cc libmpi_wrap.$(SO) muk.h
 	$(CXX) $(CXXFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
-test_allgather: test_allgather.cc libmpi_wrap.$(SO) mpi_wrap.h
+test_allgather: test_allgather.cc libmpi_wrap.$(SO) muk.h
 	$(CXX) $(CXXFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
-test_alltoall: test_alltoall.cc libmpi_wrap.$(SO) mpi_wrap.h
+test_alltoall: test_alltoall.cc libmpi_wrap.$(SO) muk.h
 	$(CXX) $(CXXFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
-test_gather: test_gather.cc libmpi_wrap.$(SO) mpi_wrap.h
+test_gather: test_gather.cc libmpi_wrap.$(SO) muk.h
 	$(CXX) $(CXXFLAGS) $< -L. -Wl,-rpath,$(RPATH) -lmpi_wrap -o $@
 
 MPI_H =

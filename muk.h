@@ -74,37 +74,40 @@ extern "C" {
 // //#define MPI_COMM_WORLD 2
 // const MPI_Comm MPI_COMM_WORLD = {.ip = 2};
 
-extern int MPI_Init(int *argc, char ***argv);
-extern int MPI_Init_thread(int *argc, char ***argv, int required, int *provided);
-extern int MPI_Initialized(int *flag);
-extern int MPI_Finalize(void);
-extern int MPI_Finalized(int *flag);
+// these two functions must be called before calling any MPI functions
+extern int MUK_Init_handle(void);
+extern int MUK_Finalize_handle(void);
 
-extern int (*MPI_Query_thread)(int *provided);
+extern int (*MUK_Init)(int *argc, char ***argv);
+extern int (*MUK_Init_thread)(int *argc, char ***argv, int required, int *provided);
+extern int (*MUK_Initialized)(int *flag);
+extern int (*MUK_Finalize)(void);
+extern int (*MUK_Finalized)(int *flag);
+extern int (*MUK_Query_thread)(int *provided);
 
-extern int (*MPI_Comm_rank)(MPI_Comm comm, int *rank);
-extern int (*MPI_Comm_size)(MPI_Comm comm, int *size);
-extern int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm);
-extern int (*MPI_Comm_free)(MPI_Comm *comm);
-extern int (*MPI_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result);
-extern int (*MPI_Comm_split)(MPI_Comm comm, int color, int key, MPI_Comm *newcomm);
-extern int (*MPI_Comm_split_type)(MPI_Comm comm, int split_type, int key, MPI_Info info, MPI_Comm *newcomm);
+extern int (*MUK_Comm_rank)(MPI_Comm comm, int *rank);
+extern int (*MUK_Comm_size)(MPI_Comm comm, int *size);
+extern int (*MUK_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm);
+extern int (*MUK_Comm_free)(MPI_Comm *comm);
+extern int (*MUK_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result);
+extern int (*MUK_Comm_split)(MPI_Comm comm, int color, int key, MPI_Comm *newcomm);
+extern int (*MUK_Comm_split_type)(MPI_Comm comm, int split_type, int key, MPI_Info info, MPI_Comm *newcomm);
 
-extern int (*MPI_Send)(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
-extern int (*MPI_Recv)(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
-extern int (*MPI_Sendrecv)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag,
+extern int (*MUK_Send)(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm);
+extern int (*MUK_Recv)(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status);
+extern int (*MUK_Sendrecv)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag,
                            MPI_Comm comm, MPI_Status *status);
 
-extern int (*MPI_Allgather)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm);
-extern int (*MPI_Allgatherv)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, const int recvcounts[], const int displs[], MPI_Datatype recvtype, MPI_Comm comm);
-extern int (*MPI_Allreduce)(const void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm);
-extern int (*MPI_Alltoall)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm);
-extern int (*MPI_Barrier)(MPI_Comm comm);
-extern int (*MPI_Bcast)(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm);
-extern int (*MPI_Gather)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm);
+extern int (*MUK_Allgather)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm);
+extern int (*MUK_Allgatherv)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, const int recvcounts[], const int displs[], MPI_Datatype recvtype, MPI_Comm comm);
+extern int (*MUK_Allreduce)(const void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm);
+extern int (*MUK_Alltoall)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm);
+extern int (*MUK_Barrier)(MPI_Comm comm);
+extern int (*MUK_Bcast)(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm);
+extern int (*MUK_Gather)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm);
 
-extern int (*MPI_Type_get_extent)(MPI_Datatype datatype, MPI_Aint *lb, MPI_Aint *extent);
-extern int (*MPI_Get_processor_name)(char *name, int *resultlen);
+extern int (*MUK_Type_get_extent)(MPI_Datatype datatype, MPI_Aint *lb, MPI_Aint *extent);
+extern int (*MUK_Get_processor_name)(char *name, int *resultlen);
 #ifdef __cplusplus
 }
 #endif

@@ -17,15 +17,16 @@
 
 int main(int argc, char *argv[])
 {
+  init();
   int rc, provided;
-  rc = MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+  rc = MUK_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
   assert(rc == MPI_SUCCESS);
 
   int me, np;
   MPI_Comm comm;
-  MPI_Comm_dup(MPI_COMM_WORLD, &comm);
-  MPI_Comm_rank(comm, &me);
-  MPI_Comm_size(comm, &np);
+  MUK_Comm_dup(MPI_COMM_WORLD, &comm);
+  MUK_Comm_rank(comm, &me);
+  MUK_Comm_size(comm, &np);
   printf("Allreduce, I am %d of %d\n", me, np);
 
   int SIZE = 100;
@@ -34,15 +35,15 @@ int main(int argc, char *argv[])
     unsigned long long expected = (np-1)*np/2;
     unsigned long long *send_buf1 = init_array_const<unsigned long long>(SIZE, me);
     unsigned long long *recv_buf1 = init_array_const<unsigned long long>(SIZE, me);
-    MPI_Allreduce(send_buf1, recv_buf1, SIZE, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
+    MUK_Allreduce(send_buf1, recv_buf1, SIZE, MPI_UNSIGNED_LONG_LONG, MPI_SUM, comm);
     check_array_const<unsigned long long>(SIZE, recv_buf1, expected);
 
     free(send_buf1);
     free(recv_buf1);
   }
 
-  MPI_Comm_free(&comm);
+  MUK_Comm_free(&comm);
 
-  MPI_Finalize();
+  MUK_Finalize();
   return 0;
 }

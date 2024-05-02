@@ -23,8 +23,22 @@
 #ifdef USE_REAL_MPI
 #include <mpi.h>
 #else
-#include "mpi_wrap.h"
+#include "muk.h"
 #endif
+
+void init(void)
+{
+#ifndef USE_REAL_MPI
+  MUK_Init_handle();
+#endif
+}
+
+void finalize(void)
+{
+#ifndef USE_REAL_MPI
+  MUK_Finalize_handle();
+#endif
+}
 
 int main(int argc, char *argv[])
 {
@@ -36,42 +50,44 @@ int main(int argc, char *argv[])
   }
 #endif
 
+  init();
   int rc, provided, flag;
-  MPI_Initialized(&flag);
+  MUK_Initialized(&flag);
   assert(flag == 0);
-  rc = MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+  rc = MUK_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
   assert(rc == MPI_SUCCESS);
-  MPI_Initialized(&flag);
+  MUK_Initialized(&flag);
   assert(flag == 1);
-  MPI_Query_thread(&provided);
+  MUK_Query_thread(&provided);
   assert(provided == MPI_THREAD_MULTIPLE);
 
   int me, np;
   MPI_Comm comms[2];
   comms[0] = MPI_COMM_WORLD;
-  MPI_Comm_dup(comms[0], &(comms[1]));
+  MUK_Comm_dup(comms[0], &(comms[1]));
   char name[128];
   int resultlen;
-  MPI_Get_processor_name(name, &resultlen);
+  MUK_Get_processor_name(name, &resultlen);
   for(int i = 0; i < 2; i++) {
-    MPI_Comm_rank(comms[i], &me);
-    MPI_Comm_size(comms[i], &np);
+    MUK_Comm_rank(comms[i], &me);
+    MUK_Comm_size(comms[i], &np);
     printf("I am %d of %d, host %s, resultlen %d\n", me, np, name, resultlen);
-    MPI_Barrier(comms[i]);
+    MUK_Barrier(comms[i]);
   }
 
   // assert(comms[0] == (MPI_Comm)MPI_COMM_WORLD);
 
   int result;
-  MPI_Comm_compare(comms[0], comms[1], &result);
+  MUK_Comm_compare(comms[0], comms[1], &result);
   assert(result == MPI_CONGRUENT);
   
-  MPI_Comm_free(&(comms[1]));
+  MUK_Comm_free(&(comms[1]));
 
-  MPI_Finalized(&flag);
+  MUK_Finalized(&flag);
   assert(flag == 0);
-  MPI_Finalize();
-  MPI_Finalized(&flag);
+  MUK_Finalize();
+  MUK_Finalized(&flag);
   assert(flag == 1);
+  finalize();
   return 0;
 }

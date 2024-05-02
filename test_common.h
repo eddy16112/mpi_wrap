@@ -27,7 +27,7 @@
 #ifdef USE_REAL_MPI
 #include <mpi.h>
 #else
-#include "mpi_wrap.h"
+#include "muk.h"
 #endif
 
 template <typename T>
@@ -80,4 +80,17 @@ void update_array(size_t size, T *buffer)
   }
 }
 
+void init(void)
+{
+#ifndef USE_REAL_MPI
+  MUK_Init_handle();
+#endif
+}
+
+void finalize(void)
+{
+#ifndef USE_REAL_MPI
+  MUK_Finalize_handle();
+#endif
+}
 #endif /* MPI_TEST_COMMON_H */

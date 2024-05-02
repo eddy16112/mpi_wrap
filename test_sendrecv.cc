@@ -17,15 +17,16 @@
 
 int main(int argc, char *argv[])
 {
+  init();
   int rc, provided;
-  rc = MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+  rc = MUK_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
   assert(rc == MPI_SUCCESS);
 
   int me, np;
   MPI_Comm comm;
-  MPI_Comm_dup(MPI_COMM_WORLD, &comm);
-  MPI_Comm_rank(comm, &me);
-  MPI_Comm_size(comm, &np);
+  MUK_Comm_dup(MPI_COMM_WORLD, &comm);
+  MUK_Comm_rank(comm, &me);
+  MUK_Comm_size(comm, &np);
   printf("I am %d of %d\n", me, np);
 
   int SIZE = 100;
@@ -42,7 +43,7 @@ int main(int argc, char *argv[])
     } else if(me == np - 1) {
       sendto = 0;
     }
-    MPI_Sendrecv(send_buf1, SIZE, MPI_INT, sendto, 0, recv_buf1, SIZE, MPI_INT, recvfrom, 0, comm, MPI_STATUS_IGNORE);
+    MUK_Sendrecv(send_buf1, SIZE, MPI_INT, sendto, 0, recv_buf1, SIZE, MPI_INT, recvfrom, 0, comm, MPI_STATUS_IGNORE);
     check_array<int>(SIZE, recv_buf1, recvfrom);
 
     free(send_buf1);
@@ -61,7 +62,7 @@ int main(int argc, char *argv[])
     } else if(me == np - 1) {
       sendto = 0;
     }
-    MPI_Sendrecv(send_buf1, SIZE, MPI_FLOAT, sendto, 0, recv_buf1, SIZE, MPI_FLOAT, recvfrom, 0, comm, MPI_STATUS_IGNORE);
+    MUK_Sendrecv(send_buf1, SIZE, MPI_FLOAT, sendto, 0, recv_buf1, SIZE, MPI_FLOAT, recvfrom, 0, comm, MPI_STATUS_IGNORE);
     check_array<float>(SIZE, recv_buf1, recvfrom);
 
     free(send_buf1);
@@ -80,7 +81,7 @@ int main(int argc, char *argv[])
     } else if(me == np - 1) {
       sendto = 0;
     }
-    MPI_Sendrecv(send_buf1, SIZE, MPI_DOUBLE, sendto, 0, recv_buf1, SIZE, MPI_DOUBLE, recvfrom, 0, comm, MPI_STATUS_IGNORE);
+    MUK_Sendrecv(send_buf1, SIZE, MPI_DOUBLE, sendto, 0, recv_buf1, SIZE, MPI_DOUBLE, recvfrom, 0, comm, MPI_STATUS_IGNORE);
     check_array<double>(SIZE, recv_buf1, recvfrom);
 
     free(send_buf1);
@@ -99,7 +100,7 @@ int main(int argc, char *argv[])
     } else if(me == np - 1) {
       sendto = 0;
     }
-    MPI_Sendrecv(send_buf1, SIZE, MPI_CHAR, sendto, 0, recv_buf1, SIZE, MPI_CHAR, recvfrom, 0, comm, MPI_STATUS_IGNORE);
+    MUK_Sendrecv(send_buf1, SIZE, MPI_CHAR, sendto, 0, recv_buf1, SIZE, MPI_CHAR, recvfrom, 0, comm, MPI_STATUS_IGNORE);
     check_array<char>(SIZE, recv_buf1, recvfrom);
 
     free(send_buf1);
@@ -118,7 +119,7 @@ int main(int argc, char *argv[])
     } else if(me == np - 1) {
       sendto = 0;
     }
-    MPI_Sendrecv(send_buf1, SIZE, MPI_UINT64_T, sendto, 0, recv_buf1, SIZE, MPI_UINT64_T, recvfrom, 0, comm, MPI_STATUS_IGNORE);
+    MUK_Sendrecv(send_buf1, SIZE, MPI_UINT64_T, sendto, 0, recv_buf1, SIZE, MPI_UINT64_T, recvfrom, 0, comm, MPI_STATUS_IGNORE);
     check_array<uint64_t>(SIZE, recv_buf1, recvfrom);
 
     free(send_buf1);
@@ -137,15 +138,16 @@ int main(int argc, char *argv[])
     } else if(me == np - 1) {
       sendto = 0;
     }
-    MPI_Sendrecv(send_buf1, SIZE, MPI_UNSIGNED_LONG_LONG, sendto, 0, recv_buf1, SIZE, MPI_UNSIGNED_LONG_LONG, recvfrom, 0, comm, MPI_STATUS_IGNORE);
+    MUK_Sendrecv(send_buf1, SIZE, MPI_UNSIGNED_LONG_LONG, sendto, 0, recv_buf1, SIZE, MPI_UNSIGNED_LONG_LONG, recvfrom, 0, comm, MPI_STATUS_IGNORE);
     check_array<unsigned long long>(SIZE, recv_buf1, recvfrom);
 
     free(send_buf1);
     free(recv_buf1);
   }
 
-  MPI_Comm_free(&comm);
+  MUK_Comm_free(&comm);
 
-  MPI_Finalize();
+  MUK_Finalize();
+  finalize();
   return 0;
 }

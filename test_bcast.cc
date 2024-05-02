@@ -17,15 +17,16 @@
 
 int main(int argc, char *argv[])
 {
+  init();
   int rc, provided;
-  rc = MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+  rc = MUK_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
   assert(rc == MPI_SUCCESS);
 
   int me, np;
   MPI_Comm comm;
-  MPI_Comm_dup(MPI_COMM_WORLD, &comm);
-  MPI_Comm_rank(comm, &me);
-  MPI_Comm_size(comm, &np);
+  MUK_Comm_dup(MPI_COMM_WORLD, &comm);
+  MUK_Comm_rank(comm, &me);
+  MUK_Comm_size(comm, &np);
   printf("Bcast, I am %d of %d\n", me, np);
 
   int SIZE = 100;
@@ -33,14 +34,15 @@ int main(int argc, char *argv[])
   for (int i = 0; i < np; i++) {
     int expected = i;
     int *send_buf = init_array<int>(SIZE, me);
-    MPI_Bcast(send_buf, SIZE * sizeof(int), MPI_BYTE, i, comm);
+    MUK_Bcast(send_buf, SIZE * sizeof(int), MPI_BYTE, i, comm);
     check_array<int>(SIZE, send_buf, expected);
 
     free(send_buf);
   }
 
-  MPI_Comm_free(&comm);
+  MUK_Comm_free(&comm);
 
-  MPI_Finalize();
+  MUK_Finalize();
+  finalize();
   return 0;
 }

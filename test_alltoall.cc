@@ -17,15 +17,16 @@
 
 int main(int argc, char *argv[])
 {
+  init();
   int rc, provided;
-  rc = MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+  rc = MUK_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
   assert(rc == MPI_SUCCESS);
 
   int me, np;
   MPI_Comm comm;
-  MPI_Comm_dup(MPI_COMM_WORLD, &comm);
-  MPI_Comm_rank(comm, &me);
-  MPI_Comm_size(comm, &np);
+  MUK_Comm_dup(MPI_COMM_WORLD, &comm);
+  MUK_Comm_rank(comm, &me);
+  MUK_Comm_size(comm, &np);
   printf("Alltoall, I am %d of %d\n", me, np);
 
   int my_values[3];
@@ -34,15 +35,16 @@ int main(int argc, char *argv[])
   }
 
   int buffer_recv[3];
-  MPI_Alltoall(&my_values, 1, MPI_INT, buffer_recv, 1, MPI_INT, MPI_COMM_WORLD);
+  MUK_Alltoall(&my_values, 1, MPI_INT, buffer_recv, 1, MPI_INT, MPI_COMM_WORLD);
   printf("Values collected on process %d: %d, %d, %d.\n", me, buffer_recv[0], buffer_recv[1], buffer_recv[2]);
 
-  MPI_Finalize();
+  MUK_Finalize();
 
   return EXIT_SUCCESS;
 
-  MPI_Comm_free(&comm);
+  MUK_Comm_free(&comm);
 
-  MPI_Finalize();
+  MUK_Finalize();
+  finalize();
   return 0;
 }

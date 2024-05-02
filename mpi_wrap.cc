@@ -1,4 +1,4 @@
-#include "mpi_wrap.h"
+#include "muk.h"
 #include "impl.h"
 
 #include <stddef.h>
@@ -12,31 +12,36 @@
 extern "C" {
 #endif
 
-int (*MPI_Query_thread)(int *provided) = nullptr;
+int (*MUK_Init)(int *argc, char ***argv) = NULL;
+int (*MUK_Init_thread)(int *argc, char ***argv, int required, int *provided) = NULL;
+int (*MUK_Initialized)(int *flag) = NULL;
+int (*MUK_Finalize)(void) = NULL;
+int (*MUK_Finalized)(int *flag) = NULL;
+int (*MUK_Query_thread)(int *provided) = NULL;
 
-int (*MPI_Comm_rank)(MPI_Comm comm, int *rank) = nullptr;
-int (*MPI_Comm_size)(MPI_Comm comm, int *size) = nullptr;
-int (*MPI_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = nullptr;
-int (*MPI_Comm_free)(MPI_Comm *comm) = nullptr;
-int (*MPI_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result) = nullptr;
-int (*MPI_Comm_split)(MPI_Comm comm, int color, int key, MPI_Comm *newcomm) = nullptr;
-int (*MPI_Comm_split_type)(MPI_Comm comm, int split_type, int key, MPI_Info info, MPI_Comm *newcomm) = nullptr;
+int (*MUK_Comm_rank)(MPI_Comm comm, int *rank) = NULL;
+int (*MUK_Comm_size)(MPI_Comm comm, int *size) = NULL;
+int (*MUK_Comm_dup)(MPI_Comm comm, MPI_Comm *newcomm) = NULL;
+int (*MUK_Comm_free)(MPI_Comm *comm) = NULL;
+int (*MUK_Comm_compare)(MPI_Comm comm1, MPI_Comm comm2, int *result) = NULL;
+int (*MUK_Comm_split)(MPI_Comm comm, int color, int key, MPI_Comm *newcomm) = NULL;
+int (*MUK_Comm_split_type)(MPI_Comm comm, int split_type, int key, MPI_Info info, MPI_Comm *newcomm) = NULL;
 
-int (*MPI_Send)(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm) = nullptr;
-int (*MPI_Recv)(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status) = nullptr;
-int (*MPI_Sendrecv)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag, MPI_Comm comm,
-                    MPI_Status *status) = nullptr;
+int (*MUK_Send)(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm) = NULL;
+int (*MUK_Recv)(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status) = NULL;
+int (*MUK_Sendrecv)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, int dest, int sendtag, void *recvbuf, int recvcount, MPI_Datatype recvtype, int source, int recvtag, MPI_Comm comm,
+                    MPI_Status *status) = NULL;
 
-int (*MPI_Allgather)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm) = nullptr;
-int (*MPI_Allgatherv)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, const int recvcounts[], const int displs[], MPI_Datatype recvtype, MPI_Comm comm) = nullptr;
-int (*MPI_Allreduce)(const void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) = nullptr;
-int (*MPI_Alltoall)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm) = nullptr;
-int (*MPI_Barrier)(MPI_Comm comm) = nullptr;
-int (*MPI_Bcast)(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm) = nullptr;
-int (*MPI_Gather)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm) = nullptr;
+int (*MUK_Allgather)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm) = NULL;
+int (*MUK_Allgatherv)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, const int recvcounts[], const int displs[], MPI_Datatype recvtype, MPI_Comm comm) = NULL;
+int (*MUK_Allreduce)(const void *sendbuf, void *recvbuf, int count, MPI_Datatype datatype, MPI_Op op, MPI_Comm comm) = NULL;
+int (*MUK_Alltoall)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, MPI_Comm comm) = NULL;
+int (*MUK_Barrier)(MPI_Comm comm) = NULL;
+int (*MUK_Bcast)(void *buffer, int count, MPI_Datatype datatype, int root, MPI_Comm comm) = NULL;
+int (*MUK_Gather)(const void *sendbuf, int sendcount, MPI_Datatype sendtype, void *recvbuf, int recvcount, MPI_Datatype recvtype, int root, MPI_Comm comm) = NULL;
 
-int (*MPI_Type_get_extent)(MPI_Datatype datatype, MPI_Aint *lb, MPI_Aint *extent) = nullptr;
-int (*MPI_Get_processor_name)(char *name, int *resultlen) = nullptr;
+int (*MUK_Type_get_extent)(MPI_Datatype datatype, MPI_Aint *lb, MPI_Aint *extent) = NULL;
+int (*MUK_Get_processor_name)(char *name, int *resultlen) = NULL;
 #ifdef __cplusplus
 }
 #endif
@@ -117,7 +122,7 @@ namespace MUK {
     std::string impl_lib;
     std::string mpi_lib;
     if(version == 1) {
-      mpi_lib = "/usr/local/openmpi-4.1.5/lib/libmpi.so";
+      mpi_lib = "/scratch2/wwu/ompi-5/lib/libmpi.so";
     } else {
       mpi_lib = "/scratch2/wwu/mpich-4.2.1/install/lib/libmpi.so";
     }
@@ -149,30 +154,35 @@ namespace MUK {
     impl_wrap_handle.mpi_so_handle = mpi_so_handle;
     impl_wrap_init_fnptr(&impl_wrap_handle);
 
-    MPI_Query_thread = impl_wrap_handle.WRAP_Query_thread;
+    MUK_Init = impl_wrap_handle.WRAP_Init;
+    MUK_Init_thread = impl_wrap_handle.WRAP_Init_thread;
+    MUK_Initialized = impl_wrap_handle.WRAP_Initialized;
+    MUK_Finalize = impl_wrap_handle.WRAP_Finalize;
+    MUK_Finalized = impl_wrap_handle.WRAP_Finalized;
+    MUK_Query_thread = impl_wrap_handle.WRAP_Query_thread;
 
-    MPI_Comm_rank = impl_wrap_handle.WRAP_Comm_rank;
-    MPI_Comm_size = impl_wrap_handle.WRAP_Comm_size;
-    MPI_Comm_dup = impl_wrap_handle.WRAP_Comm_dup;
-    MPI_Comm_free = impl_wrap_handle.WRAP_Comm_free;
-    MPI_Comm_compare = impl_wrap_handle.WRAP_Comm_compare;
-    MPI_Comm_split = impl_wrap_handle.WRAP_Comm_split;
-    MPI_Comm_split_type = impl_wrap_handle.WRAP_Comm_split_type;
+    MUK_Comm_rank = impl_wrap_handle.WRAP_Comm_rank;
+    MUK_Comm_size = impl_wrap_handle.WRAP_Comm_size;
+    MUK_Comm_dup = impl_wrap_handle.WRAP_Comm_dup;
+    MUK_Comm_free = impl_wrap_handle.WRAP_Comm_free;
+    MUK_Comm_compare = impl_wrap_handle.WRAP_Comm_compare;
+    MUK_Comm_split = impl_wrap_handle.WRAP_Comm_split;
+    MUK_Comm_split_type = impl_wrap_handle.WRAP_Comm_split_type;
 
-    MPI_Send = impl_wrap_handle.WRAP_Send;
-    MPI_Recv = impl_wrap_handle.WRAP_Recv;
-    MPI_Sendrecv = impl_wrap_handle.WRAP_Sendrecv;
+    MUK_Send = impl_wrap_handle.WRAP_Send;
+    MUK_Recv = impl_wrap_handle.WRAP_Recv;
+    MUK_Sendrecv = impl_wrap_handle.WRAP_Sendrecv;
 
-    MPI_Allgather = impl_wrap_handle.WRAP_Allgather;
-    MPI_Allgatherv = impl_wrap_handle.WRAP_Allgatherv;
-    MPI_Allreduce = impl_wrap_handle.WRAP_Allreduce;
-    MPI_Alltoall = impl_wrap_handle.WRAP_Alltoall;
-    MPI_Barrier = impl_wrap_handle.WRAP_Barrier;
-    MPI_Bcast = impl_wrap_handle.WRAP_Bcast;
-    MPI_Gather = impl_wrap_handle.WRAP_Gather;
+    MUK_Allgather = impl_wrap_handle.WRAP_Allgather;
+    MUK_Allgatherv = impl_wrap_handle.WRAP_Allgatherv;
+    MUK_Allreduce = impl_wrap_handle.WRAP_Allreduce;
+    MUK_Alltoall = impl_wrap_handle.WRAP_Alltoall;
+    MUK_Barrier = impl_wrap_handle.WRAP_Barrier;
+    MUK_Bcast = impl_wrap_handle.WRAP_Bcast;
+    MUK_Gather = impl_wrap_handle.WRAP_Gather;
 
-    MPI_Type_get_extent = impl_wrap_handle.WRAP_Type_get_extent;
-    MPI_Get_processor_name = impl_wrap_handle.WRAP_Get_processor_name;
+    MUK_Type_get_extent = impl_wrap_handle.WRAP_Type_get_extent;
+    MUK_Get_processor_name = impl_wrap_handle.WRAP_Get_processor_name;
 
     impl_wrap_handle_initialized = true;
 
@@ -195,67 +205,14 @@ namespace MUK {
 
 extern "C" {
 
-int MPI_Initialized(int *flag)
+int MUK_Init_handle(void)
 {
-  if (MUK::mpi_initialized == 1) {
-    *flag = 1;
-    return MPI_SUCCESS;
-  } else if (MUK::mpi_initialized == 0) {
-    *flag = 0;
-    return MPI_SUCCESS;
-  } else {
-    MUK::mpi_wrap_load();
-    int rc = MUK::impl_wrap_handle.WRAP_Initialized(flag);
-    return rc;
-  }
+  return MUK::mpi_wrap_load();
 }
 
-int MPI_Init(int *argc, char ***argv)
+int MUK_Finalize_handle(void)
 {
-  int rc = 0;
-  if (!MUK::impl_wrap_handle_initialized) {
-    MUK::mpi_wrap_load();
-  }
-  rc = MUK::impl_wrap_handle.WRAP_Init(argc, argv);
-  MUK::mpi_initialized = 1;
-  return rc;
+  return MUK::mpi_wrap_unload();
 }
 
-int MPI_Init_thread(int *argc, char ***argv, int required, int *provided)
-{
-  int rc = 0;
-  if (!MUK::impl_wrap_handle_initialized) {
-    MUK::mpi_wrap_load();
-  }
-  rc = MUK::impl_wrap_handle.WRAP_Init_thread(argc, argv, required, provided);
-  MUK::mpi_initialized = 1;
-  return rc;
-}
-
-int MPI_Finalize(void)
-{
-  assert(MUK::impl_wrap_handle_initialized);
-  int rc = MUK::impl_wrap_handle.WRAP_Finalize();
-  MUK::mpi_initialized = 0;
-  MUK::mpi_finalized = 1;
-  MUK::mpi_wrap_unload();
-  return rc;
-}
-
-int MPI_Finalized(int *flag)
-{
-  if (MUK::mpi_finalized == 1) {
-    *flag = 1;
-    return MPI_SUCCESS;
-  } else if (MUK::mpi_finalized == 0) {
-    *flag = 0;
-    return MPI_SUCCESS;
-  } else {
-    if (!MUK::impl_wrap_handle_initialized) {
-      MUK::mpi_wrap_load();
-    }
-    int rc = MUK::impl_wrap_handle.WRAP_Finalized(flag);
-    return rc;
-  }
-}
 }

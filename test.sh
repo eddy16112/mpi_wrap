@@ -2,7 +2,8 @@ set -e
 set -x
 
 MPICH_DIR=/scratch2/wwu/mpich-4.2.1/install
-OMPI_DIR=/usr/local/openmpi-4.1.5
+#OMPI_DIR=/usr/local/openmpi-4.1.5
+OMPI_DIR=/scratch2/wwu/ompi-5
 
 OMPI_RUN=${OMPI_DIR}/bin/mpirun
 MPICH_RUN=${MPICH_DIR}/bin/mpirun

@@ -30,15 +30,16 @@ void check_result(size_t size, T *buffer, int np)
 
 int main(int argc, char *argv[])
 {
+  init();
   int rc, provided;
-  rc = MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+  rc = MUK_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
   assert(rc == MPI_SUCCESS);
 
   int me, np;
   MPI_Comm comm;
-  MPI_Comm_dup(MPI_COMM_WORLD, &comm);
-  MPI_Comm_rank(comm, &me);
-  MPI_Comm_size(comm, &np);
+  MUK_Comm_dup(MPI_COMM_WORLD, &comm);
+  MUK_Comm_rank(comm, &me);
+  MUK_Comm_size(comm, &np);
   printf("Bcast, I am %d of %d\n", me, np);
 
   int SIZE = 100;
@@ -46,7 +47,7 @@ int main(int argc, char *argv[])
   for(int i = 0; i < np; i++) {
     int *send_buf = init_array_const<int>(SIZE, me);
     int *recv_buf = init_array_const<int>(SIZE * np, me);
-    MPI_Gather(send_buf, SIZE * sizeof(int), MPI_BYTE, recv_buf, SIZE, MPI_INT, i, comm);
+    MUK_Gather(send_buf, SIZE * sizeof(int), MPI_BYTE, recv_buf, SIZE, MPI_INT, i, comm);
     if(me == i) {
       check_result<int>(SIZE, recv_buf, np);
     }
@@ -55,8 +56,9 @@ int main(int argc, char *argv[])
     free(recv_buf);
   }
 
-  MPI_Comm_free(&comm);
+  MUK_Comm_free(&comm);
 
-  MPI_Finalize();
+  MUK_Finalize();
+  finalize();
   return 0;
 }
